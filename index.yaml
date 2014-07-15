@@ -4,6 +4,6 @@ indexes:
   ancestor: no
   properties:
   - name: latitud
-  	direction: asc
+    direction: asc
   - name: longitud
     direction: desc
