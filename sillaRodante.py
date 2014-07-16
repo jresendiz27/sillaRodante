@@ -13,6 +13,10 @@ import logging as logger
 
 import webapp2
 
+#clases de utileria
+utileria = Util()
+#clase para las herramientas de mapas
+mapTool = MapTool()
 MAIN_PAGE = Template("""\
     <html>
         <body>
@@ -71,9 +75,21 @@ class GuardarPuntosClavePage(webapp2.RequestHandler):
             puntoAGuardar = PuntoClave()
             puntoAGuardar.latitud = float(self.request.get('latitud'))
             puntoAGuardar.longitud = float(self.request.get('longitud'))
-            puntoAGuardar.tipo = int(self.request.get('tipo')) % 4
-            #puntoAGuardar.valoracion = int(self.request.get('valoracion'))
-            puntoAGuardar.put()
+            puntoAGuardar.tipo = int(self.request.get('tipo'))
+            puntoAGuardar.valoracion = 0.0
+            puntoAGuardar.numeroValoraciones = 1
+            puntoEncontrado = utileria.esPuntoSemejante(puntoAGuardar)
+            logger.error(puntoEncontrado)
+            logger.error(puntoEncontrado)
+            logger.error(puntoEncontrado)
+            if not(puntoEncontrado):
+                logger.error("No existe el punto, se guarda uno nuevo!!")
+                puntoAGuardar.put()
+            else:
+                logger.error("Existe, solo se actualiza!")
+                puntoEncontrado.tipo = int(self.request.get('tipo'))
+                #puntoEncontrado.numeroValoraciones = puntoEncontrado.numeroValoraciones + 1
+                puntoEncontrado.put()
             if bool(self.request.get('dev')):  #Si existe el parametro debug!, se genera la pagina web
                 print("Guardado!!!!")
                 self.response.write(
@@ -108,10 +124,6 @@ class MostrarPuntosClavePage(webapp2.RequestHandler):
 
 class ObtenerRutasPage(webapp2.RequestHandler):
     def get(self):
-        #clases de utileria
-        utileria = Util()
-        #clase para las herramientas de mapas
-        mapTool = MapTool()
         puntoOrigen,puntoDestino = mapTool.obtenerPuntos(self.request)
         #Se imprime el error en caso de existir, y se regresan los objetos
         puntosClave = utileria.obtenerPuntos(self.request)

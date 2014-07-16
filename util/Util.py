@@ -63,33 +63,34 @@ class Util:
             rangos = self.obtenerAreaDeBusqueda(punto1, punto2)
             #Se ejecuta la consulta con los parametros obtenidos, primero se filtra la latitud
             puntosFiltro1 = PuntoClave.query(PuntoClave.latitud<=rangos['latitudMaxima'],PuntoClave.latitud>=rangos['latitudMinima']).fetch(100)
-            #puntosFiltro1 = PuntoClave.query().fetch(100)
-            """
-            puntosFiltro1 = PuntoClave.gql(
-                        where
-                            latitud <=:latMax
-                        and
-                            latitud >=:latMin
-                            ,
-                           latMax=rangos['latitudMaxima'],
-                           latMin=rangos['latitudMinima']).fetch(100)"""
-            logger.error("--------------------------------")
-            logger.error("--------------------------------")
-            logger.error("--------------------------------")
-            logger.error(len(puntosFiltro1))
-            logger.error("--------------------------------")
-            logger.error("--------------------------------")
-            logger.error("--------------------------------")
             #Se aplica un segundo filtro, limitantes de Datastore (NoSQL) por razones de indices.
-            #Se hace un fetch de ciertos puntos ya que se considera que no es necesario obtener todo.
-            """for punto in puntosFiltro1:
-                if punto.longitud <= rangos['longitudMaxima'] and punto.longitud >= rangos['longitudMinima']:
-                    puntosFiltrados.append(punto)"""
+            puntosFiltrados = filter(lambda punto: punto.longitud<=rangos['longitudMaxima'] and punto.longitud>=rangos['longitudMinima'],puntosFiltro1)
+            return puntosFiltrados
         except Exception as e:
             logger.error("No se pudieron obtener los puntos")
             logger.error(e)
-        return puntosFiltro1
+        return puntosFiltrados
 
     def lecturaProperties(self):
         valores = dict(line.strip().split('=') for line in open('passwords.properties'))
         return valores
+
+    def esPuntoSemejante(self,puntoAComparar):
+        diferencia = 0.0001
+        #Se generan las diferencias
+        latitudMaxima = puntoAComparar.latitud + diferencia
+        latitudMinima = puntoAComparar.latitud - diferencia
+        longitudMaxima = puntoAComparar.longitud + diferencia
+        longitudMinima = puntoAComparar.longitud - diferencia
+        #Se hace la consulta 1
+        listaPuntosFiltro1 = PuntoClave.query()
+        listaPuntosFiltro2 = listaPuntosFiltro1.filter(PuntoClave.latitud<=latitudMaxima,PuntoClave.latitud>=latitudMinima).fetch(10)
+        #listaPuntosFiltro3 = listaPuntosFiltro2.filter(PuntoClave.longitud<=longitudMaxima,PuntoClave.longitud>=longitudMinima).fetch(1)
+        listaPuntosFiltro3 =  filter(lambda punto: punto.longitud<=longitudMaxima and punto.longitud>=longitudMinima,listaPuntosFiltro2)
+        print(listaPuntosFiltro3)
+        print(listaPuntosFiltro3)
+        print(listaPuntosFiltro3)
+        if len(listaPuntosFiltro3):
+            return listaPuntosFiltro3[0]
+        else:
+            return False
