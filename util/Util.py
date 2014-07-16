@@ -13,7 +13,7 @@ class Util:
         puntosMasLejanos['latitudMinima'] = 0.0
         puntosMasLejanos['longitudMinima'] = 0.0
         #Se considera una diferencia de 0.0001 para los rangos, Gracias a Ricardo por ayudar a determinar la ubicacion del punto
-        diferencia = 0.0001
+        diferencia = 0.03
         #Se determina la ubicacion por una comparacio, gracias a Joaquin por ayudar a la visualizacion de los puntos en un plano x,y
         if punto1.latitud >= punto2.latitud:
             #Punto 1 arriba de punto 2
@@ -38,6 +38,8 @@ class Util:
             #Se calculan el maximo y el minimo de las longitudes
             puntosMasLejanos['longitudMaxima'] = punto2.longitud + diferencia
             puntosMasLejanos['longitudMinima'] = punto1.longitud - diferencia
+        logger.error("Area de Busqueda")
+        logger.error(puntosMasLejanos)
         return puntosMasLejanos
 
     def obtenerPuntos(self, request):
@@ -60,24 +62,33 @@ class Util:
             #Se calculan las latitudes maximas y minimas llamando al metodo generado previamente
             rangos = self.obtenerAreaDeBusqueda(punto1, punto2)
             #Se ejecuta la consulta con los parametros obtenidos, primero se filtra la latitud
-            puntosFiltro1 = PuntoClave.gql("""
+            puntosFiltro1 = PuntoClave.query(PuntoClave.latitud<=rangos['latitudMaxima'],PuntoClave.latitud>=rangos['latitudMinima']).fetch(100)
+            #puntosFiltro1 = PuntoClave.query().fetch(100)
+            """
+            puntosFiltro1 = PuntoClave.gql(
                         where
                             latitud <=:latMax
                         and
                             latitud >=:latMin
-                            """,
+                            ,
                            latMax=rangos['latitudMaxima'],
-                           latMin=rangos['latitudMinima']).fetch(100)
-
+                           latMin=rangos['latitudMinima']).fetch(100)"""
+            logger.error("--------------------------------")
+            logger.error("--------------------------------")
+            logger.error("--------------------------------")
+            logger.error(len(puntosFiltro1))
+            logger.error("--------------------------------")
+            logger.error("--------------------------------")
+            logger.error("--------------------------------")
             #Se aplica un segundo filtro, limitantes de Datastore (NoSQL) por razones de indices.
             #Se hace un fetch de ciertos puntos ya que se considera que no es necesario obtener todo.
-            for punto in puntosFiltro1:
+            """for punto in puntosFiltro1:
                 if punto.longitud <= rangos['longitudMaxima'] and punto.longitud >= rangos['longitudMinima']:
-                    puntosFiltrados.append(punto)
+                    puntosFiltrados.append(punto)"""
         except Exception as e:
             logger.error("No se pudieron obtener los puntos")
             logger.error(e)
-        return puntosFiltrados
+        return puntosFiltro1
 
     def lecturaProperties(self):
         valores = dict(line.strip().split('=') for line in open('passwords.properties'))

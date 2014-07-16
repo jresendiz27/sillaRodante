@@ -1,4 +1,4 @@
-from util import Punto
+from util.Punto import Punto
 import logging as logger
 #se utilizara el fetch de google!
 import urllib
@@ -24,21 +24,23 @@ class MapTool:
 		#Se prepara la peticion
 		#El diccionario de campos se limpia de caracteres erroneos
 		form_data = urllib.urlencode(form_fields)
-		logger.info(form_data)
+		#logger.info(form_data)
 		#Se Obtiene la respuesta del servicio de google!
 		logger.info(url+form_data)
 		result = urlfetch.fetch(url=(url+form_data),
 		    method=urlfetch.GET,
 		    headers={'Content-Type': 'text/plain; charset=utf-8'})
-		logger.info("-"*70)
-		logger.info(result.content)
-		logger.info("-"*70)
+		#logger.info("-"*70)
+		#logger.info(result.content)
+		#logger.info("-"*70)
 		return result.content
 
 	def codificarPunto(self, punto):
 		pass
 	def obtenerPuntos(self,request):
 		#se generan instancias de los puntos
+		logger.debug("------->")
+		logger.debug(request)
 		puntoOrigen = None
 		puntoDestino = None
 		try:

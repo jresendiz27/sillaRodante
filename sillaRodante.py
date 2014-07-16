@@ -71,7 +71,8 @@ class GuardarPuntosClavePage(webapp2.RequestHandler):
             puntoAGuardar = PuntoClave()
             puntoAGuardar.latitud = float(self.request.get('latitud'))
             puntoAGuardar.longitud = float(self.request.get('longitud'))
-            puntoAGuardar.valoracion = int(self.request.get('valoracion'))
+            puntoAGuardar.tipo = int(self.request.get('tipo')) % 4
+            #puntoAGuardar.valoracion = int(self.request.get('valoracion'))
             puntoAGuardar.put()
             if bool(self.request.get('dev')):  #Si existe el parametro debug!, se genera la pagina web
                 print("Guardado!!!!")
@@ -111,28 +112,14 @@ class ObtenerRutasPage(webapp2.RequestHandler):
         utileria = Util()
         #clase para las herramientas de mapas
         mapTool = MapTool()
-        #puntoOrigen,puntoDestino = mapTool.obtenerPuntos(self.request)
-        puntoOrigen = None
-        puntoDestino = None
-        try:
-            puntoOrigen = Punto()
-            puntoDestino = Punto()
-            #Se asignan los valores de request
-            #Origen
-            puntoOrigen.latitud = float(self.request.get('latitudOrigen'))
-            puntoOrigen.longitud = float(self.request.get('longitudOrigen'))
-            #Destino
-            puntoDestino.latitud = float(self.request.get('latitudDestino'))
-            puntoDestino.longitud = float(self.request.get('longitudDestino'))
-        except Exception as e:
-            logger.error("No se pudieron convertir los parametros de la peticion a puntos geograficos.")
-            logger.error(e)
+        puntoOrigen,puntoDestino = mapTool.obtenerPuntos(self.request)
         #Se imprime el error en caso de existir, y se regresan los objetos
         puntosClave = utileria.obtenerPuntos(self.request)
-        logger.warn(puntoOrigen)
-        logger.warn(puntoDestino)
+        logger.debug(puntosClave)
+        #logger.warn(" -- "+puntoOrigen)
+        #logger.warn(" -- "+puntoDestino)
         rutasPosibles = mapTool.obtenerRutasOptimasEntrePuntos(puntoOrigen,puntoDestino,puntosClave)
-        self.response.headers['Content-Type'] = 'application/json'
+        self.response.headers['Content-Type'] = 'application/json; charset=utf-8'
         self.response.out.write(rutasPosibles)
 
     #Un little hack para que funcione por ambos metodos,se usara POST, por motivos de encapsulamiento de la informacion
@@ -141,7 +128,7 @@ class ObtenerRutasPage(webapp2.RequestHandler):
 
 
 application = webapp2.WSGIApplication([
-                                          ('/test', GuardarPuntosClavePage),
+                                          ('/generarPunto', GuardarPuntosClavePage),
                                           ('/', GuardarPuntosClavePage),
                                           ('/obtenerPuntos', MostrarPuntosClavePage),
                                           ('/obtenerRutas',ObtenerRutasPage )
