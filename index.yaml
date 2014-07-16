@@ -1,9 +1,10 @@
 indexes:
-
 - kind: PuntoClave
   ancestor: no
   properties:
   - name: latitud
     direction: asc
   - name: longitud
-    direction: desc
+    direction: asc
+  - name: tipo
+    direction: asc
