@@ -10,7 +10,7 @@ class MapTool:
 
 	def obtenerRutasOptimasEntrePuntos(self, origen, destino, puntosAConsiderar):
 		#origin=19.386749, -98.994241&destination=Cerezos+50+La+Perla+Mexico&sensor=false&mode=driving
-		url = "https://maps.googleapis.com/maps/api/directions/json"
+		url = "https://maps.googleapis.com/maps/api/directions/json?"
 		form_fields = {
 		  "origin": str(origen),
 		  "destination":str(destino) ,
@@ -27,8 +27,7 @@ class MapTool:
 		logger.info(form_data)
 		#Se Obtiene la respuesta del servicio de google!
 		logger.info(url+form_data)
-		result = urlfetch.fetch(url=url,
-		    payload=form_data,
+		result = urlfetch.fetch(url=(url+form_data),
 		    method=urlfetch.GET,
 		    headers={'Content-Type': 'text/plain; charset=utf-8'})
 		logger.info("-"*70)
