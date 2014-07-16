@@ -130,9 +130,26 @@ class ObtenerRutasPage(webapp2.RequestHandler):
         logger.debug(puntosClave)
         #logger.warn(" -- "+puntoOrigen)
         #logger.warn(" -- "+puntoDestino)
+        #json.dumps([p.to_dict() for p in Pasta.query(Pasta.name == "Ravioli").fetch()])
         rutasPosibles = mapTool.obtenerRutasOptimasEntrePuntos(puntoOrigen,puntoDestino,puntosClave)
+        mapaRespuesta = {'puntosClave':[punto.to_dict() for punto in puntosClave],'rutasPosibles': json.loads(rutasPosibles)}
         self.response.headers['Content-Type'] = 'application/json; charset=utf-8'
-        self.response.out.write(rutasPosibles)
+        logger.info("--------------------------------------")
+        logger.info("--------------------------------------")
+        logger.info("--------------------------------------")
+        logger.info("--------------------------------------")
+        logger.info("--------------------------------------")
+        logger.info("--------------------------------------")
+        logger.info("--------------------------------------")
+        logger.info(json.dumps(mapaRespuesta))
+        logger.info("--------------------------------------")
+        logger.info("--------------------------------------")
+        logger.info("--------------------------------------")
+        logger.info("--------------------------------------")
+        logger.info("--------------------------------------")
+        logger.info("--------------------------------------")
+        logger.info("--------------------------------------")
+        self.response.out.write(json.dumps(mapaRespuesta))
 
     #Un little hack para que funcione por ambos metodos,se usara POST, por motivos de encapsulamiento de la informacion
     def post(self):
