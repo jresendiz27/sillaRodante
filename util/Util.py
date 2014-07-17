@@ -6,7 +6,6 @@ class Util:
     # Metodo Web para obtener los puntos entre cierto rango
     def obtenerAreaDeBusqueda(self, punto1, punto2):
         # lista de los puntos cardinales
-        puntosCardinales = ['norte', 'sur', 'este', 'oeste']
         puntosMasLejanos = {}
         puntosMasLejanos['latitudMaxima'] = 0.0
         puntosMasLejanos['longitudMaxima'] = 0.0
