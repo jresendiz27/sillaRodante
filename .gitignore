@@ -61,3 +61,8 @@ target/
 *.iml
 #para evitar que todo lo que se genere de android (build) se agregue
 app/CondesaAccesible/app/build
+.gradle
+app/CondesaAccesible/local.properties
+app/CondesaAccesible/.idea/workspace.xml
+app/CondesaAccesible/.DS_Store
+app/CondesaAccesible/build
