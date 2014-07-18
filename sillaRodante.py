@@ -69,97 +69,97 @@ OBTENER_PUNTOS_ENTRE_AREA_FORM = """
 
 
 class GuardarPuntosClavePage(webapp2.RequestHandler):
-	def get(self):
-		mensajeExito = 'Guardaro Correctamente!'
-		try:
-			puntoAGuardar = PuntoClave()
-			puntoAGuardar.latitud = float(self.request.get('latitud'))
-			puntoAGuardar.longitud = float(self.request.get('longitud'))
-			puntoAGuardar.tipo = int(self.request.get('tipo'))
-			puntoAGuardar.valoracion = 0.0
-			puntoAGuardar.numeroValoraciones = 1
-			puntoEncontrado = utileria.esPuntoSemejante(puntoAGuardar)
-			logger.error(puntoEncontrado)
-			logger.error(puntoEncontrado)
-			logger.error(puntoEncontrado)
-			if not (puntoEncontrado):
-				logger.error("No existe el punto, se guarda uno nuevo!!")
-				puntoAGuardar.put()
-			else:
-				logger.error("Existe, solo se actualiza!")
-				puntoEncontrado.tipo = int(self.request.get('tipo'))
-				#puntoEncontrado.numeroValoraciones = puntoEncontrado.numeroValoraciones + 1
-				puntoEncontrado.put()
-			if bool(self.request.get('dev')):  #Si existe el parametro debug!, se genera la pagina web
-				print("Guardado!!!!")
-				self.response.write(
-					MAIN_PAGE.substitute(mensaje=mensajeExito, formularioACargar=GUARDAR_PUNTOS_CLAVE_FORM,
-					                     formularioConsulta=OBTENER_PUNTOS_ENTRE_AREA_FORM))
-			#significa que solo necesitan la respuesta en JSON, posiblemente en produccion
-			else:
-				mapaRespuesta = {'mensaje': 'Guardado Correctamente!'}
-				self.response.headers['Content-Type'] = 'application/json'
-				self.response.out.write(json.dumps(mapaRespuesta))
+    def get(self):
+        mensajeExito = 'Guardaro Correctamente!'
+        try:
+            puntoAGuardar = PuntoClave()
+            puntoAGuardar.latitud = float(self.request.get('latitud'))
+            puntoAGuardar.longitud = float(self.request.get('longitud'))
+            puntoAGuardar.tipo = int(self.request.get('tipo'))
+            puntoAGuardar.valoracion = 0.0
+            puntoAGuardar.numeroValoraciones = 1
+            puntoEncontrado = utileria.esPuntoSemejante(puntoAGuardar)
+            logger.error(puntoEncontrado)
+            logger.error(puntoEncontrado)
+            logger.error(puntoEncontrado)
+            if not (puntoEncontrado):
+                logger.error("No existe el punto, se guarda uno nuevo!!")
+                puntoAGuardar.put()
+            else:
+                logger.error("Existe, solo se actualiza!")
+                puntoEncontrado.tipo = int(self.request.get('tipo'))
+                #puntoEncontrado.numeroValoraciones = puntoEncontrado.numeroValoraciones + 1
+                puntoEncontrado.put()
+            if bool(self.request.get('dev')):  #Si existe el parametro debug!, se genera la pagina web
+                print("Guardado!!!!")
+                self.response.write(
+                    MAIN_PAGE.substitute(mensaje=mensajeExito, formularioACargar=GUARDAR_PUNTOS_CLAVE_FORM,
+                                         formularioConsulta=OBTENER_PUNTOS_ENTRE_AREA_FORM))
+            #significa que solo necesitan la respuesta en JSON, posiblemente en produccion
+            else:
+                mapaRespuesta = {'mensaje': 'Guardado Correctamente!'}
+                self.response.headers['Content-Type'] = 'application/json'
+                self.response.out.write(json.dumps(mapaRespuesta))
 
-				#self.redirect('/test')
-		except Exception as e:
-			self.response.write(MAIN_PAGE.substitute(mensaje=e, formularioACargar=GUARDAR_PUNTOS_CLAVE_FORM,
-			                                         formularioConsulta=OBTENER_PUNTOS_ENTRE_AREA_FORM))
+                #self.redirect('/test')
+        except Exception as e:
+            self.response.write(MAIN_PAGE.substitute(mensaje=e, formularioACargar=GUARDAR_PUNTOS_CLAVE_FORM,
+                                                     formularioConsulta=OBTENER_PUNTOS_ENTRE_AREA_FORM))
 
-	def post(self):
-		self.get()
+    def post(self):
+        self.get()
 
 
 class MostrarPuntosClavePage(webapp2.RequestHandler):
-	def get(self):
-		utileria = Util()
-		listadoDePuntos = utileria.obtenerPuntos(self.request)
-		jsonAMostrar = json.dumps([punto.to_dict() for punto in listadoDePuntos])
-		self.response.write(jsonAMostrar)
+    def get(self):
+        utileria = Util()
+        listadoDePuntos = utileria.obtenerPuntos(self.request)
+        jsonAMostrar = json.dumps([punto.to_dict() for punto in listadoDePuntos])
+        self.response.write(jsonAMostrar)
 
-	#self.redirect('/?' + urllib.urlencode(query_params))
-	def post(self):
-		self.get()
+    #self.redirect('/?' + urllib.urlencode(query_params))
+    def post(self):
+        self.get()
 
 
 class ObtenerRutasPage(webapp2.RequestHandler):
-	def get(self):
-		puntoOrigen, puntoDestino = mapTool.obtenerPuntos(self.request)
-		#Se imprime el error en caso de existir, y se regresan los objetos
-		puntosClave = utileria.obtenerPuntos(self.request)
-		logger.debug(puntosClave)
-		#logger.warn(" -- "+puntoOrigen)
-		#logger.warn(" -- "+puntoDestino)
-		#json.dumps([p.to_dict() for p in Pasta.query(Pasta.name == "Ravioli").fetch()])
-		rutasPosibles = mapTool.obtenerRutasOptimasEntrePuntos(puntoOrigen, puntoDestino, puntosClave)
-		mapaRespuesta = {'puntosClave': [punto.to_dict() for punto in puntosClave],
-		                 'rutasPosibles': json.loads(rutasPosibles)}
-		self.response.headers['Content-Type'] = 'application/json; charset=utf-8'
-		logger.info("--------------------------------------")
-		logger.info("--------------------------------------")
-		logger.info("--------------------------------------")
-		logger.info("--------------------------------------")
-		logger.info("--------------------------------------")
-		logger.info("--------------------------------------")
-		logger.info("--------------------------------------")
-		logger.info(json.dumps(mapaRespuesta))
-		logger.info("--------------------------------------")
-		logger.info("--------------------------------------")
-		logger.info("--------------------------------------")
-		logger.info("--------------------------------------")
-		logger.info("--------------------------------------")
-		logger.info("--------------------------------------")
-		logger.info("--------------------------------------")
-		self.response.out.write(json.dumps(mapaRespuesta))
+    def get(self):
+        puntoOrigen, puntoDestino = mapTool.obtenerPuntos(self.request)
+        #Se imprime el error en caso de existir, y se regresan los objetos
+        puntosClave = utileria.obtenerPuntos(self.request)
+        logger.debug(puntosClave)
+        #logger.warn(" -- "+puntoOrigen)
+        #logger.warn(" -- "+puntoDestino)
+        #json.dumps([p.to_dict() for p in Pasta.query(Pasta.name == "Ravioli").fetch()])
+        rutasPosibles = mapTool.obtenerRutasOptimasEntrePuntos(puntoOrigen, puntoDestino, puntosClave)
+        mapaRespuesta = {'puntosClave': [punto.to_dict() for punto in puntosClave],
+                         'rutasPosibles': json.loads(rutasPosibles)}
+        self.response.headers['Content-Type'] = 'application/json; charset=utf-8'
+        logger.info("--------------------------------------")
+        logger.info("--------------------------------------")
+        logger.info("--------------------------------------")
+        logger.info("--------------------------------------")
+        logger.info("--------------------------------------")
+        logger.info("--------------------------------------")
+        logger.info("--------------------------------------")
+        logger.info(json.dumps(mapaRespuesta))
+        logger.info("--------------------------------------")
+        logger.info("--------------------------------------")
+        logger.info("--------------------------------------")
+        logger.info("--------------------------------------")
+        logger.info("--------------------------------------")
+        logger.info("--------------------------------------")
+        logger.info("--------------------------------------")
+        self.response.out.write(json.dumps(mapaRespuesta))
 
-	#Un little hack para que funcione por ambos metodos,se usara POST, por motivos de encapsulamiento de la informacion
-	def post(self):
-		self.get()
+    #Un little hack para que funcione por ambos metodos,se usara POST, por motivos de encapsulamiento de la informacion
+    def post(self):
+        self.get()
 
 
 application = webapp2.WSGIApplication([
-	                                      ('/generarPunto', GuardarPuntosClavePage),
-	                                      ('/', GuardarPuntosClavePage),
-	                                      ('/obtenerPuntos', MostrarPuntosClavePage),
-	                                      ('/obtenerRutas', ObtenerRutasPage )
+                                          ('/generarPunto', GuardarPuntosClavePage),
+                                          ('/', GuardarPuntosClavePage),
+                                          ('/obtenerPuntos', MostrarPuntosClavePage),
+                                          ('/obtenerRutas', ObtenerRutasPage )
                                       ], debug=True)

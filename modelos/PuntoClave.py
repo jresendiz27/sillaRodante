@@ -10,4 +10,4 @@ class PuntoClave(ndb.Model):
     numeroValoraciones = ndb.IntegerProperty()
 
     def __str__(self):
-	    return "%s,%s" % (self.latitud,self.longitud)
+        return "%s,%s" % (self.latitud,self.longitud)
