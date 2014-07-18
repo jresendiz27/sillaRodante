@@ -57,3 +57,7 @@ target/
 *.cfg
 #para evitar la integracion con PyCharm[IDE]
 .idea/
+#para evitar la integracion con los archivos .iml
+*.iml
+#para evitar que todo lo que se genere de android (build) se agregue
+app/CondesaAccesible/app/build
