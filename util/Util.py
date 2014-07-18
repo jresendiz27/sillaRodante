@@ -3,6 +3,7 @@ import logging as logger
 from modelos.PuntoClave import PuntoClave
 from util.Punto import Punto
 
+from operator import itemgetter, attrgetter
 
 class Util:
 	# Metodo Web para obtener los puntos entre cierto rango
@@ -47,6 +48,7 @@ class Util:
 		punto1 = Punto()
 		punto2 = Punto()
 		puntosFiltrados = []
+		puntosOrdenadosPorTipo = []
 		try:
 			# Se obtiene la ubicacion del cliente
 			latitudOrigen = float(request.get('latitudOrigen'))
@@ -64,16 +66,18 @@ class Util:
 			rangos = self.obtenerAreaDeBusqueda(punto1, punto2)
 			#Se ejecuta la consulta con los parametros obtenidos, primero se filtra la latitud
 			puntosFiltro1 = PuntoClave.query(PuntoClave.latitud <= rangos['latitudMaxima'],
-			                                 PuntoClave.latitud >= rangos['latitudMinima']).fetch(100)
+			                                 PuntoClave.longitud <= rangos['longitudMaxima']).fetch(100)
 			#Se aplica un segundo filtro, limitantes de Datastore (NoSQL) por razones de indices.
 			puntosFiltrados = filter(
-				lambda punto: punto.longitud <= rangos['longitudMaxima'] and punto.longitud >= rangos['longitudMinima'],
+				lambda punto: punto.longitud >= rangos['latitudMinima'] and punto.longitud >= rangos['longitudMinima'],
 				puntosFiltro1)
-			return puntosFiltrados
+			#Se procede a ordenar por el tipo y luego por el valor del mismo
+			puntosOrdenadosPorTipo = sorted(puntosFiltrados,key=attrgetter('tipo','valoracion'),reverse=True)
+			return puntosOrdenadosPorTipo
 		except Exception as e:
 			logger.error("No se pudieron obtener los puntos")
 			logger.error(e)
-		return puntosFiltrados
+		return puntosOrdenadosPorTipo
 
 	def lecturaProperties(self):
 		valores = dict(line.strip().split('=') for line in open('passwords.properties'))
@@ -89,13 +93,10 @@ class Util:
 		#Se hace la consulta 1
 		listaPuntosFiltro1 = PuntoClave.query()
 		listaPuntosFiltro2 = listaPuntosFiltro1.filter(PuntoClave.latitud <= latitudMaxima,
-		                                               PuntoClave.latitud >= latitudMinima).fetch(10)
+		                                               PuntoClave.longitud <= longitudMinima).fetch(10)
 		#listaPuntosFiltro3 = listaPuntosFiltro2.filter(PuntoClave.longitud<=longitudMaxima,PuntoClave.longitud>=longitudMinima).fetch(1)
-		listaPuntosFiltro3 = filter(lambda punto: punto.longitud <= longitudMaxima and punto.longitud >= longitudMinima,
+		listaPuntosFiltro3 = filter(lambda punto: punto.latitud >= latitudMinima and punto.longitud >= longitudMinima,
 		                            listaPuntosFiltro2)
-		print(listaPuntosFiltro3)
-		print(listaPuntosFiltro3)
-		print(listaPuntosFiltro3)
 		if len(listaPuntosFiltro3):
 			return listaPuntosFiltro3[0]
 		else:
