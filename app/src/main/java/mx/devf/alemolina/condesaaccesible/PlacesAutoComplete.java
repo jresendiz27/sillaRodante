@@ -9,6 +9,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -32,8 +33,19 @@ public class PlacesAutoComplete extends AsyncTask<String, Void, ArrayList<String
         return autocomplete(params[0]);
     }
 
+    private ArrayList<String> idList = null;
+    private ArrayList<String> suggestions = null;
+
+    public String getItemPlaceId(int position){
+        return idList.get(position);
+    }
+
+    public ArrayList<String> getSuggestions() {
+        return suggestions;
+    }
+
+    // https://maps.googleapis.com/maps/api/place/details/json/?key=AIzaSyBVy5AeNC0FzQD1aKpZciL06wtLQ5qd2k4&place_id=ChIJhZD8llz_0YURsKigpkDsai8
     public ArrayList<String> autocomplete(String input) {
-        ArrayList<String> resultList = null;
 
         HttpURLConnection conn = null;
         StringBuilder jsonResults = new StringBuilder();
@@ -55,10 +67,10 @@ public class PlacesAutoComplete extends AsyncTask<String, Void, ArrayList<String
             }
         } catch (MalformedURLException e) {
             Log.e(LOG_TAG, "Error processing Places API URL", e);
-            return resultList;
+            return suggestions;
         } catch (IOException e) {
             Log.e(LOG_TAG, "Error connecting to Places API", e);
-            return resultList;
+            return suggestions;
         } finally {
             if (conn != null) {
                 conn.disconnect();
@@ -72,15 +84,21 @@ public class PlacesAutoComplete extends AsyncTask<String, Void, ArrayList<String
             JSONArray predsJsonArray = jsonObj.getJSONArray("predictions");
 
             // Extract the Place descriptions from the results
-            resultList = new ArrayList<String>(predsJsonArray.length());
+            idList = new ArrayList<String>(predsJsonArray.length());
             for (int i = 0; i < predsJsonArray.length(); i++) {
-                resultList.add(predsJsonArray.getJSONObject(i).getString("description"));
+                idList.add(predsJsonArray.getJSONObject(i).getString("place_id"));
             }
+
+            suggestions = new ArrayList<String>(predsJsonArray.length());
+            for (int i = 0; i < predsJsonArray.length(); i++) {
+                suggestions.add(predsJsonArray.getJSONObject(i).getString("description"));
+            }
+
         } catch (JSONException e) {
             Log.e(LOG_TAG, "Cannot process JSON results", e);
         }
 
-        return resultList;
+        return suggestions;
     }
 
 }

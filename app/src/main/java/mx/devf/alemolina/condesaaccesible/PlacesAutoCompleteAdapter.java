@@ -11,7 +11,9 @@ import java.util.ArrayList;
  * Created by alemolina on 7/16/14.
  */
 public class PlacesAutoCompleteAdapter extends ArrayAdapter<String> implements Filterable {
-    private ArrayList<String> resultList;
+
+    private PlacesAutoComplete completer;
+    private ArrayList<String> resultList = new ArrayList<String>();
 
     public PlacesAutoCompleteAdapter(Context context, int textViewResourceId) {
         super(context, textViewResourceId);
@@ -36,10 +38,9 @@ public class PlacesAutoCompleteAdapter extends ArrayAdapter<String> implements F
                 if (constraint != null) {
                     // Retrieve the autocomplete results.
 
-                    PlacesAutoComplete completer = new PlacesAutoComplete() ;
+                    completer = new PlacesAutoComplete() ;
                     resultList = completer.autocomplete(constraint.toString());
 
-                    // resultList = autocomplete(constraint.toString());
 
                     // Assign the data to the FilterResults
                     filterResults.values = resultList;
@@ -58,5 +59,9 @@ public class PlacesAutoCompleteAdapter extends ArrayAdapter<String> implements F
                 }
             }};
         return filter;
+    }
+
+    public String getItemPlaceId(int position) {
+        return completer.getItemPlaceId(position);
     }
 }
