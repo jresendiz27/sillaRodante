@@ -47,7 +47,6 @@ public class MainActivity extends FragmentActivity {
     private Button buttonRed;
     private View.OnClickListener buttonListener;
 
-
     private final String TAG = "CondesaAccesible";
 
     // Definition of "latlng" which will contain current location information.
@@ -84,18 +83,30 @@ public class MainActivity extends FragmentActivity {
         final PlacesAutoCompleteAdapter adapter = new PlacesAutoCompleteAdapter(this, R.layout.list_item);
         autoCompView.setAdapter(adapter);
 
-        AdapterView.OnItemClickListener itemClickLisener = new AdapterView.OnItemClickListener() {
+        AdapterView.OnItemClickListener itemClickListener = new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String placeId = adapter.getItemPlaceId(position);
-                //TODO: Use Geocoding API in order to save their lat & lon.
-
+                final String placeName = adapter.getItem(position);
+                GetLatLngFromId latlngService = new GetLatLngFromId();
+                latlngService.setListener(new GetLatLngFromId.OnLatLngListener() {
+                    @Override
+                    public void latLngReady(LatLng latlng) {
+                       setDestinationPin(latlng, placeName);
+                    }
+                });
+                latlngService.execute(placeId);
             }
         };
-        autoCompView.setOnItemClickListener(itemClickLisener);
+        autoCompView.setOnItemClickListener(itemClickListener);
 
 
         Log.i(TAG, "ADIOS");
+    }
+
+    private void setDestinationPin(LatLng latlng, String placeName) {
+        //Log.i(TAG, latlng.toString());
+        mMap.addMarker(new MarkerOptions().position(latlng).title(placeName).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
     }
 
     @Override
@@ -197,62 +208,22 @@ public class MainActivity extends FragmentActivity {
     private void makeUseOfNewLocation(Location location) {
         latlng = new LatLng(location.getLatitude(), location.getLongitude());
         // mMap.addMarker(new MarkerOptions().position(latlng).title("Aqui estas"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latlng));
+        // mMap.moveCamera(CameraUpdateFactory.newLatLng(latlng));
     }
 
     ///////////////////////envio de datos
     public void sendScore(int score, LatLng latlng) {
         try {
-            new HTTPTask().execute("" + latlng.latitude, "" + latlng.longitude, "" + score);
+            HTTPTask task = new HTTPTask();
+            task.setApplicationContext(getApplicationContext());
+            task.execute("" + latlng.latitude, "" + latlng.longitude, "" + score);
         } catch (Exception e) {
             Log.e(TAG, "error");
             e.printStackTrace();
         }
     }
 
-    private class HTTPTask extends AsyncTask<String, Integer, Double> {
 
-        @Override
-        protected Double doInBackground(String... strings) {
-            postData(strings[0], strings[1], strings[2]);
-            return null;
-        }
-
-        protected void onPostExecute(Double result) {
-            //  pb.setVisibility(View.GONE);
-            Toast.makeText(getApplicationContext(), "UBICACION GUARDADA", Toast.LENGTH_LONG).show();
-        }
-
-        protected void onProgressUpdate(Integer... progress) {
-            //pb.setProgress(progress[0]);
-        }
-
-        public void postData(String latitud, String longitud, String tipo) {
-            // Create a new HttpClient and Post Header
-            HttpClient httpclient = new DefaultHttpClient();
-            HttpPost httppost = new HttpPost("http://pepo27devf.appspot.com/generarPunto");
-
-            try {
-                // Add your data
-                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-
-                nameValuePairs.add(new BasicNameValuePair("latitud", latitud));
-                nameValuePairs.add(new BasicNameValuePair("longitud", longitud));
-                nameValuePairs.add(new BasicNameValuePair("tipo", tipo));
-
-                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-
-                // Execute HTTP Post Request
-                HttpResponse response = httpclient.execute(httppost);
-
-            } catch (ClientProtocolException e) {
-                // TODO Auto-generated catch block
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-            }
-        }
-
-    }
 
 
 }

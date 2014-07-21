@@ -9,7 +9,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -20,13 +19,14 @@ import java.util.ArrayList;
  * Created by alemolina on 7/16/14.
  */
 public class PlacesAutoComplete extends AsyncTask<String, Void, ArrayList<String>> {
-    private static final String LOG_TAG = "CondesaAccesible";
+    protected static final String LOG_TAG = "CondesaAccesible";
 
-    private static final String PLACES_API_BASE = "https://maps.googleapis.com/maps/api/place";
-    private static final String TYPE_AUTOCOMPLETE = "/autocomplete";
-    private static final String OUT_JSON = "/json";
+    protected static final String PLACES_API_BASE = "https://maps.googleapis.com/maps/api/place";
+    protected static final String TYPE_AUTOCOMPLETE = "/autocomplete";
 
-    private static final String API_KEY = "AIzaSyBVy5AeNC0FzQD1aKpZciL06wtLQ5qd2k4";
+    protected static final String OUT_JSON = "/json";
+
+    protected static final String API_KEY = "AIzaSyBVy5AeNC0FzQD1aKpZciL06wtLQ5qd2k4";
 
     @Override
     protected ArrayList<String> doInBackground(String... params) {
@@ -40,11 +40,7 @@ public class PlacesAutoComplete extends AsyncTask<String, Void, ArrayList<String
         return idList.get(position);
     }
 
-    public ArrayList<String> getSuggestions() {
-        return suggestions;
-    }
 
-    // https://maps.googleapis.com/maps/api/place/details/json/?key=AIzaSyBVy5AeNC0FzQD1aKpZciL06wtLQ5qd2k4&place_id=ChIJhZD8llz_0YURsKigpkDsai8
     public ArrayList<String> autocomplete(String input) {
 
         HttpURLConnection conn = null;
@@ -78,7 +74,7 @@ public class PlacesAutoComplete extends AsyncTask<String, Void, ArrayList<String
         }
 
         try {
-            Log.i(LOG_TAG, jsonResults.toString());
+            // Log.i(LOG_TAG, jsonResults.toString());
             // Create a JSON object hierarchy from the results
             JSONObject jsonObj = new JSONObject(jsonResults.toString());
             JSONArray predsJsonArray = jsonObj.getJSONArray("predictions");
