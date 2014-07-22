@@ -4,6 +4,8 @@ from modelos.PuntoClave import PuntoClave
 from util.Punto import Punto
 
 from operator import itemgetter, attrgetter
+import math
+import numpy as np
 
 class Util:
     # Metodo Web para obtener los puntos entre cierto rango
@@ -66,10 +68,10 @@ class Util:
             rangos = self.obtenerAreaDeBusqueda(punto1, punto2)
             #Se ejecuta la consulta con los parametros obtenidos, primero se filtra la latitud
             puntosFiltro1 = PuntoClave.query(PuntoClave.latitud <= rangos['latitudMaxima'],
-                                             PuntoClave.longitud <= rangos['longitudMaxima']).fetch(100)
+                                             PuntoClave.latitud >= rangos['latitudMinima']).fetch(100)
             #Se aplica un segundo filtro, limitantes de Datastore (NoSQL) por razones de indices.
             puntosFiltrados = filter(
-                lambda punto: punto.longitud >= rangos['latitudMinima'] and punto.longitud >= rangos['longitudMinima'],
+                lambda punto: punto.longitud <= rangos['longitudMaxima'] and punto.longitud >= rangos['longitudMinima'],
                 puntosFiltro1)
             #Se procede a ordenar por el tipo y luego por el valor del mismo
             puntosOrdenadosPorTipo = sorted(puntosFiltrados,key=attrgetter('tipo','valoracion'),reverse=True)
@@ -93,11 +95,55 @@ class Util:
         #Se hace la consulta 1
         listaPuntosFiltro1 = PuntoClave.query()
         listaPuntosFiltro2 = listaPuntosFiltro1.filter(PuntoClave.latitud <= latitudMaxima,
-                                                       PuntoClave.longitud <= longitudMinima).fetch(10)
+                                                       PuntoClave.latitud >= latitudMinima).fetch(100)
         #listaPuntosFiltro3 = listaPuntosFiltro2.filter(PuntoClave.longitud<=longitudMaxima,PuntoClave.longitud>=longitudMinima).fetch(1)
-        listaPuntosFiltro3 = filter(lambda punto: punto.latitud >= latitudMinima and punto.longitud >= longitudMinima,
+        listaPuntosFiltro3 = filter(lambda punto: punto.longitud >= longitudMaxima and punto.longitud <= longitudMinima,
                                     listaPuntosFiltro2)
         if len(listaPuntosFiltro3):
             return listaPuntosFiltro3[0]
         else:
             return False
+
+    def distanciaEntrePuntos(self,punto1,punto2):
+        #
+        lat1=punto1.latitud
+        lon1=punto1.longitud
+        #
+        lat2=punto2.latitud
+        lon2=punto2.longitud
+        R = 6371
+        a = 0.5 - math.cos((lat2 - lat1) * math.pi / 180)/2 + math.cos(lat1 * math.pi / 180) * math.cos(lat2 * math.pi / 180) * (1 - math.cos((lon2 - lon1) * math.pi / 180))/2
+        return R * 2 * math.asin(math.sqrt(a))
+
+    def expandirPunto(self,punto):
+        puntoExpandido = punto
+        puntoExpandido.latitud += 0.005
+        puntoExpandido.longitud += 0.005
+        return puntoExpandido
+
+    def calcularDistanciaOrigen_Destino(self,punto,origen,destino):
+        punto.distanciaOrigen = self.distanciaEntrePuntos(punto,origen)
+        punto.distanciaDestino = self.distanciaEntrePuntos(punto,destino)
+        return punto
+
+    def filtroDistancias(self,puntosAFiltrar,distanciaMaxima):
+        #se calcula el entero de la distancia
+        distanciaEntera = int(math.ceil(distanciaMaxima*10))
+        #se genera la matriz que almacenara los primeros puntos a filtrar
+        matrizAFiltrar = np.zeros((distanciaEntera,distanciaEntera))
+        for punto in puntosAFiltrar:
+            distanciaRespectoOrigen =  int(punto.distanciaOrigen*10)
+            distanciaRespectoDestino = int(punto.distanciaDestino*10)
+            if (matrizAFiltrar[distanciaRespectoOrigen][distanciaRespectoDestino]).distanciaOrigen >= punto.distanciaOrigen:
+                matrizAFiltrar[distanciaRespectoOrigen][distanciaRespectoDestino] = punto
+        #Se obtienen todos los puntos
+        listaFiltrada = []
+        for indiceX in range(0,distanciaEntera):
+            for indiceY in range(0,distanciaEntera):
+                if matrizAFiltrar[indiceX][indiceY]:
+                    listaFiltrada.append(matrizAFiltrar[indiceX][indiceY])
+        return listaFiltrada
+    def filtroExpansion(self,puntosAFiltrar,diferenciaExpansion,distanciaTotal):
+        numeroPuntos = len(puntosAFiltrar)
+        #se genera la matriz que almacenara los primeros puntos a filtrar
+        matrizAFiltrar = np.zeros((puntosAFiltrar,puntosAFiltrar))

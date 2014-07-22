@@ -18,12 +18,12 @@ class MapTool:
             "destination": str(destino),
             "sensor": "false",
             "alternatives": "true",
-            "optimize":"true", #para evitar que las rutas sean medio extrañas ...
+            #"optimize":"true", #para evitar que las rutas sean medio weird ...
             "mode": "walking"  #Para evitar rutas que tengan que ver con automoviles
         }
         #Se generan los puntos a pasar en forma de cadena
         if len(puntosAConsiderar):
-            waypointsCadena = "|".join([str(punto) for punto in puntosAConsiderar])
+            waypointsCadena = "optimize:true|".join([str(punto) for punto in puntosAConsiderar])
             form_fields['waypoints'] = waypointsCadena
         #Se prepara la peticion
         #El diccionario de campos se limpia de caracteres erroneos
