@@ -8,6 +8,6 @@
     <string name="buttonBlueLabel">Blue</string>
     <string name="buttonYellowLabel">Yellow</string>
     <string name="buttonRedLabel">Red</string>
-    <string name="autocompletePlaceholder">Lugar que buscas</string>
+    <string name="autocompletePlaceholder">¿A dónde quieres ir?</string>
 
 </resources>

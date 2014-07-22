@@ -15,48 +15,62 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|bottom"
-        android:id="@+id/button_container">
+        android:id="@+id/button_container"
+        android:padding="12dp">
 
         <Button
             style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/greenButtonLabel"
-            android:id="@+id/buttonGreen" />
+            android:layout_width="48dp"
+            android:layout_height="50dp"
+            android:id="@+id/buttonGreen"
+            android:background="@drawable/button_green"
+            android:layout_marginRight="12dp" />
 
         <Button
             style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/buttonBlueLabel"
-            android:id="@+id/buttonBlue" />
+            android:layout_width="48dp"
+            android:layout_height="50dp"
+            android:id="@+id/buttonBlue"
+            android:background="@drawable/button_blue"
+            android:width="48dp"
+            android:layout_marginRight="12dp" />
 
         <Button
             style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/buttonYellowLabel"
-            android:id="@+id/buttonYellow" />
+            android:layout_width="48dp"
+            android:layout_height="50dp"
+            android:id="@+id/buttonYellow"
+            android:background="@drawable/button_yellow"
+            android:width="48dp"
+            android:layout_marginRight="12dp" />
 
         <Button
             style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/buttonRedLabel"
-            android:id="@+id/buttonRed" />
+            android:layout_width="48dp"
+            android:layout_height="50dp"
+            android:id="@+id/buttonRed"
+            android:background="@drawable/button_red"
+            android:width="48dp" />
     </TableRow>
 
     <TableRow
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|top"
-        android:id="@+id/autocomplete_container">
+        android:id="@+id/autocomplete_container"
+        android:paddingRight="60dp"
+        android:paddingLeft="12dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp">
 
         <AutoCompleteTextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:id="@+id/autocompleteView"
-            android:hint="@string/autocompletePlaceholder" />
+            android:hint="@string/autocompletePlaceholder"
+            android:autoText="true"
+            android:background="@drawable/abc_search_dropdown_light"
+            android:padding="6dp" />
     </TableRow>
 
 </FrameLayout>

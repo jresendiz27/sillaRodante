@@ -4,7 +4,6 @@ import android.content.Context;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.AsyncTask;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,28 +11,14 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.Toast;
-
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class MainActivity extends FragmentActivity {
@@ -45,6 +30,7 @@ public class MainActivity extends FragmentActivity {
     private Button buttonBlue;
     private Button buttonYellow;
     private Button buttonRed;
+
     private View.OnClickListener buttonListener;
 
     private final String TAG = "CondesaAccesible";
@@ -106,6 +92,7 @@ public class MainActivity extends FragmentActivity {
 
     private void setDestinationPin(LatLng latlng, String placeName) {
         //Log.i(TAG, latlng.toString());
+        mMap.animateCamera(CameraUpdateFactory.newLatLng(latlng));
         mMap.addMarker(new MarkerOptions().position(latlng).title(placeName).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
     }
 
@@ -118,27 +105,28 @@ public class MainActivity extends FragmentActivity {
     // guess what dropColorPin does? You guessed right! (I DO hope so at least) drops a pin, the color will vary depending on the button that was clicked.
     private void dropColorPin(Button button) {
         String title;
-        float hue;
+        BitmapDescriptor hue;
         int score;
         if (button.equals(buttonGreen)) {
             title = "Rampa";
-            hue = BitmapDescriptorFactory.HUE_GREEN;
+            //hue = BitmapDescriptorFactory.fromResource(R.drawable.dot_green);
+            hue = BitmapDescriptorFactory.fromResource(R.drawable.dot_green);
             score = 4;
         } else if (button.equals(buttonBlue)) {
             title = "Camino";
-            hue = BitmapDescriptorFactory.HUE_AZURE;
+            hue = BitmapDescriptorFactory.fromResource(R.drawable.dot_blue);
             score = 3;
         } else if (button.equals(buttonYellow)) {
             title = "Alerta";
-            hue = BitmapDescriptorFactory.HUE_YELLOW;
+            hue = BitmapDescriptorFactory.fromResource(R.drawable.dot_yellow);
             score = 2;
         } else {
             title = "Impasable";
-            hue = BitmapDescriptorFactory.HUE_RED;
+            hue = BitmapDescriptorFactory.fromResource(R.drawable.dot_red);
             score = 1;
         }
         // Drops a marker in the current location.
-        mMap.addMarker(new MarkerOptions().position(latlng).title(title).icon(BitmapDescriptorFactory.defaultMarker(hue)));
+        mMap.addMarker(new MarkerOptions().position(latlng).title(title).icon(hue).anchor(0.5f,0.5f));
         // Send score to backend
         sendScore(score, latlng);
     }
@@ -179,8 +167,8 @@ public class MainActivity extends FragmentActivity {
      */
     private void setUpMap() {
         mMap.moveCamera(CameraUpdateFactory.zoomTo(16));
-
         mMap.setMyLocationEnabled(true);
+
         LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
         // Define a listener that responds to location updates
@@ -206,9 +194,12 @@ public class MainActivity extends FragmentActivity {
     }
 
     private void makeUseOfNewLocation(Location location) {
+        boolean shouldMoveMap = latlng == null;
         latlng = new LatLng(location.getLatitude(), location.getLongitude());
-        // mMap.addMarker(new MarkerOptions().position(latlng).title("Aqui estas"));
-        // mMap.moveCamera(CameraUpdateFactory.newLatLng(latlng));
+        if(shouldMoveMap){
+            mMap.addMarker(new MarkerOptions().position(latlng).title("Aqui estas"));
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(latlng));
+        }
     }
 
     ///////////////////////envio de datos
@@ -222,8 +213,5 @@ public class MainActivity extends FragmentActivity {
             e.printStackTrace();
         }
     }
-
-
-
 
 }
