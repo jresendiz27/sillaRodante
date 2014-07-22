@@ -22,16 +22,17 @@ class MapTool:
             "mode": "walking"  #Para evitar rutas que tengan que ver con automoviles
         }
         #Se generan los puntos a pasar en forma de cadena
+        waypointsCadena = ""
         if len(puntosAConsiderar):
-            waypointsCadena = "optimize:true|".join([str(punto) for punto in puntosAConsiderar])
-            form_fields['waypoints'] = waypointsCadena
+            waypointsCadena ="&waypoints=optimize:true|"+("|".join([str(punto) for punto in puntosAConsiderar]))
+            #form_fields['waypoints'] = waypointsCadena
         #Se prepara la peticion
         #El diccionario de campos se limpia de caracteres erroneos
         form_data = urllib.urlencode(form_fields)
         #logger.info(form_data)
         #Se Obtiene la respuesta del servicio de google!
-        logger.info(url + form_data)
-        result = urlfetch.fetch(url=(url + form_data),
+        logger.info(url + form_data + waypointsCadena)
+        result = urlfetch.fetch(url=(url + form_data + waypointsCadena),
                                 method=urlfetch.GET,
                                 headers={'Content-Type': 'text/plain; charset=utf-8'})
         #logger.info("-"*70)
