@@ -1,6 +1,7 @@
 package mx.devf.alemolina.condesaaccesible;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -19,6 +20,9 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
+
+import java.util.ArrayList;
 
 
 public class MainActivity extends FragmentActivity {
@@ -33,7 +37,7 @@ public class MainActivity extends FragmentActivity {
 
     private View.OnClickListener buttonListener;
 
-    private final String TAG = "CondesaAccesible";
+    public static final String TAG = "CondesaAccesible";
 
     // Definition of "latlng" which will contain current location information.
     private LatLng latlng;
@@ -77,8 +81,9 @@ public class MainActivity extends FragmentActivity {
                 GetLatLngFromId latlngService = new GetLatLngFromId();
                 latlngService.setListener(new GetLatLngFromId.OnLatLngListener() {
                     @Override
-                    public void latLngReady(LatLng latlng) {
-                       setDestinationPin(latlng, placeName);
+                    public void latLngReady(LatLng destination) {
+                       setDestinationPin(destination, placeName);
+                       drawPath(latlng, destination);
                     }
                 });
                 latlngService.execute(placeId);
@@ -94,6 +99,23 @@ public class MainActivity extends FragmentActivity {
         //Log.i(TAG, latlng.toString());
         mMap.animateCamera(CameraUpdateFactory.newLatLng(latlng));
         mMap.addMarker(new MarkerOptions().position(latlng).title(placeName).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+    }
+
+    private void drawPath(LatLng origin, LatLng destination){
+        GetPointsInRoute pointService = new GetPointsInRoute();
+        pointService.setListener(new GetPointsInRoute.OnPathListener() {
+            @Override
+            public void latLngReady(ArrayList<LatLng> pointsInPath) {
+                PolylineOptions polyLineOptions = new PolylineOptions();
+                polyLineOptions.addAll(pointsInPath);
+                polyLineOptions.width(5);
+                polyLineOptions.color(Color.BLUE);
+                mMap.addPolyline(polyLineOptions);
+            }
+        });
+        pointService.execute(origin, destination);
+
+
     }
 
     @Override
@@ -191,6 +213,9 @@ public class MainActivity extends FragmentActivity {
         // Register the listener with the Location Manager to receive location updates
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+
+
+
     }
 
     private void makeUseOfNewLocation(Location location) {
