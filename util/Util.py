@@ -6,9 +6,11 @@ from util.Punto import Punto
 from operator import itemgetter, attrgetter
 import math
 import numpy as np
-
+MAX_WAYPOINTS = 8
 class Util:
     # Metodo Web para obtener los puntos entre cierto rango
+    #Constante que define google
+
     def obtenerAreaDeBusqueda(self, punto1, punto2):
         # lista de los puntos cardinales
         puntosMasLejanos = {}
@@ -147,3 +149,35 @@ class Util:
         numeroPuntos = len(puntosAFiltrar)
         #se genera la matriz que almacenara los primeros puntos a filtrar
         matrizAFiltrar = np.zeros((puntosAFiltrar,puntosAFiltrar))
+    #Eliminacion a lo tonto!!!
+    def limpiarPuntos(self,listaDePuntos):
+        if len(listaDePuntos)<= MAX_WAYPOINTS:
+            #No necesita ser limpiada
+            return listaDePuntos
+        else:
+            listaParcial = []
+            if (len(listaDePuntos) % 2) == 0:
+                listaParcial = self.recortarPares(listaDePuntos)
+            else:
+                listaParcial = self.recortarPares(listaDePuntos)
+        return self.limpiarPuntos(listaParcial)
+
+    def recortarPares(self,listaALimpiar):
+        listaSinPares = []
+        if len(listaALimpiar) >= MAX_WAYPOINTS:
+            for indice in range(0,len(listaALimpiar)):
+                if not(indice % 2):
+                    listaSinPares.append(listaALimpiar[indice])
+            return listaSinPares
+        else:
+            return listaALimpiar
+
+    def recortarImpares(self,listaALimpiar):
+        listaSinImpares = []
+        if len(listaALimpiar) >= MAX_WAYPOINTS:
+            for indice in range(0,len(listaALimpiar)):
+                if indice % 2:
+                    listaSinImpares.append(listaALimpiar[indice])
+            return listaSinImpares
+        else:
+            return listaALimpiar
