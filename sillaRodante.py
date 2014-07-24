@@ -132,10 +132,15 @@ class ObtenerRutasPage(webapp2.RequestHandler):
         #logger.warn(" -- "+puntoDestino)
         #json.dumps([p.to_dict() for p in Pasta.query(Pasta.name == "Ravioli").fetch()])
         logger.error("")
-        puntosLimpios = utileria.limpiarPuntos(puntosClave)
-        rutasPosibles = mapTool.obtenerRutasOptimasEntrePuntos(puntoOrigen, puntoDestino, puntosLimpios)
+        puntosLimpios = utileria.porVecinosIntercalados(puntosClave,puntoOrigen,puntoDestino)
+        #
+        rutaPropuesta = mapTool.obtenerRutasOptimasEntrePuntos(puntoOrigen, puntoDestino, puntosLimpios)
+        rutaMaps = mapTool.obtenerRutasOptimasEntrePuntos(puntoOrigen, puntoDestino, [])
+        #
         mapaRespuesta = {'puntosClave': [punto.to_dict() for punto in puntosClave],
-                         'rutasPosibles': json.loads(rutasPosibles)}
+                         'rutaPropuesta': json.loads(rutaPropuesta),
+                         'rutaMaps':json.loads(rutaMaps)
+                        }
         self.response.headers['Content-Type'] = 'application/json; charset=utf-8'
         logger.info("--------------------------------------")
         logger.info("--------------------------------------")

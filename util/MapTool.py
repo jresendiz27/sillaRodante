@@ -19,7 +19,7 @@ class MapTool:
             "sensor": "false",
             "alternatives": "true",
             #"optimize":"true", #para evitar que las rutas sean medio weird ...
-            "mode": "walking"  #Para evitar rutas que tengan que ver con automoviles
+            "mode": "bicycling"  #Para evitar rutas que tengan que ver con automoviles
         }
         #Se generan los puntos a pasar en forma de cadena
         waypointsCadena = ""
@@ -32,6 +32,11 @@ class MapTool:
         #logger.info(form_data)
         #Se Obtiene la respuesta del servicio de google!
         logger.info(url + form_data + waypointsCadena)
+        logger.info(url + form_data + waypointsCadena)
+        logger.info(url + form_data + waypointsCadena)
+        logger.info(url + form_data + waypointsCadena)
+        logger.info(url + form_data + waypointsCadena)
+
         result = urlfetch.fetch(url=(url + form_data + waypointsCadena),
                                 method=urlfetch.GET,
                                 headers={'Content-Type': 'text/plain; charset=utf-8'})

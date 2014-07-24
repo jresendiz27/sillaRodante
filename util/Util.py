@@ -1,15 +1,19 @@
 import logging as logger
+from operator import itemgetter, attrgetter
+import math
+from operator import itemgetter, attrgetter
+
+import numpy as np
 
 from modelos.PuntoClave import PuntoClave
 from util.Punto import Punto
 
-from operator import itemgetter, attrgetter
-import math
-import numpy as np
 MAX_WAYPOINTS = 8
+
+
 class Util:
     # Metodo Web para obtener los puntos entre cierto rango
-    #Constante que define google
+    # Constante que define google
 
     def obtenerAreaDeBusqueda(self, punto1, punto2):
         # lista de los puntos cardinales
@@ -76,7 +80,7 @@ class Util:
                 lambda punto: punto.longitud <= rangos['longitudMaxima'] and punto.longitud >= rangos['longitudMinima'],
                 puntosFiltro1)
             #Se procede a ordenar por el tipo y luego por el valor del mismo
-            puntosOrdenadosPorTipo = sorted(puntosFiltrados,key=attrgetter('tipo','valoracion'),reverse=True)
+            puntosOrdenadosPorTipo = sorted(puntosFiltrados, key=attrgetter('tipo', 'valoracion'), reverse=True)
             return puntosOrdenadosPorTipo
         except Exception as e:
             logger.error("No se pudieron obtener los puntos")
@@ -106,52 +110,56 @@ class Util:
         else:
             return False
 
-    def distanciaEntrePuntos(self,punto1,punto2):
+    def distanciaEntrePuntos(self, punto1, punto2):
         #
-        lat1=punto1.latitud
-        lon1=punto1.longitud
+        lat1 = punto1.latitud
+        lon1 = punto1.longitud
         #
-        lat2=punto2.latitud
-        lon2=punto2.longitud
+        lat2 = punto2.latitud
+        lon2 = punto2.longitud
         R = 6371
-        a = 0.5 - math.cos((lat2 - lat1) * math.pi / 180)/2 + math.cos(lat1 * math.pi / 180) * math.cos(lat2 * math.pi / 180) * (1 - math.cos((lon2 - lon1) * math.pi / 180))/2
+        a = 0.5 - math.cos((lat2 - lat1) * math.pi / 180) / 2 + math.cos(lat1 * math.pi / 180) * math.cos(
+            lat2 * math.pi / 180) * (1 - math.cos((lon2 - lon1) * math.pi / 180)) / 2
         return R * 2 * math.asin(math.sqrt(a))
 
-    def expandirPunto(self,punto):
+    def expandirPunto(self, punto):
         puntoExpandido = punto
         puntoExpandido.latitud += 0.005
         puntoExpandido.longitud += 0.005
         return puntoExpandido
 
-    def calcularDistanciaOrigen_Destino(self,punto,origen,destino):
-        punto.distanciaOrigen = self.distanciaEntrePuntos(punto,origen)
-        punto.distanciaDestino = self.distanciaEntrePuntos(punto,destino)
+    def calcularDistanciaOrigen_Destino(self, punto, origen, destino):
+        punto.distanciaOrigen = self.distanciaEntrePuntos(punto, origen)
+        punto.distanciaDestino = self.distanciaEntrePuntos(punto, destino)
         return punto
 
-    def filtroDistancias(self,puntosAFiltrar,distanciaMaxima):
+    def filtroDistancias(self, puntosAFiltrar, distanciaMaxima):
         #se calcula el entero de la distancia
-        distanciaEntera = int(math.ceil(distanciaMaxima*10))
+        distanciaEntera = int(math.ceil(distanciaMaxima * 10))
         #se genera la matriz que almacenara los primeros puntos a filtrar
-        matrizAFiltrar = np.zeros((distanciaEntera,distanciaEntera))
+        matrizAFiltrar = np.zeros((distanciaEntera, distanciaEntera))
         for punto in puntosAFiltrar:
-            distanciaRespectoOrigen =  int(punto.distanciaOrigen*10)
-            distanciaRespectoDestino = int(punto.distanciaDestino*10)
-            if (matrizAFiltrar[distanciaRespectoOrigen][distanciaRespectoDestino]).distanciaOrigen >= punto.distanciaOrigen:
+            distanciaRespectoOrigen = int(punto.distanciaOrigen * 10)
+            distanciaRespectoDestino = int(punto.distanciaDestino * 10)
+            if (
+            matrizAFiltrar[distanciaRespectoOrigen][distanciaRespectoDestino]).distanciaOrigen >= punto.distanciaOrigen:
                 matrizAFiltrar[distanciaRespectoOrigen][distanciaRespectoDestino] = punto
         #Se obtienen todos los puntos
         listaFiltrada = []
-        for indiceX in range(0,distanciaEntera):
-            for indiceY in range(0,distanciaEntera):
+        for indiceX in range(0, distanciaEntera):
+            for indiceY in range(0, distanciaEntera):
                 if matrizAFiltrar[indiceX][indiceY]:
                     listaFiltrada.append(matrizAFiltrar[indiceX][indiceY])
         return listaFiltrada
-    def filtroExpansion(self,puntosAFiltrar,diferenciaExpansion,distanciaTotal):
+
+    def filtroExpansion(self, puntosAFiltrar, diferenciaExpansion, distanciaTotal):
         numeroPuntos = len(puntosAFiltrar)
         #se genera la matriz que almacenara los primeros puntos a filtrar
-        matrizAFiltrar = np.zeros((puntosAFiltrar,puntosAFiltrar))
+        matrizAFiltrar = np.zeros((puntosAFiltrar, puntosAFiltrar))
+
     #Eliminacion a lo tonto!!!
-    def limpiarPuntos(self,listaDePuntos):
-        if len(listaDePuntos)<= MAX_WAYPOINTS:
+    def limpiarPuntos(self, listaDePuntos):
+        if len(listaDePuntos) <= MAX_WAYPOINTS:
             #No necesita ser limpiada
             return listaDePuntos
         else:
@@ -162,22 +170,51 @@ class Util:
                 listaParcial = self.recortarPares(listaDePuntos)
         return self.limpiarPuntos(listaParcial)
 
-    def recortarPares(self,listaALimpiar):
+    def obtenerMasCercanos(self, listaDePuntos, origen, destino):
+        pass
+
+    def recortarPares(self, listaALimpiar):
         listaSinPares = []
         if len(listaALimpiar) >= MAX_WAYPOINTS:
-            for indice in range(0,len(listaALimpiar)):
-                if not(indice % 2):
+            for indice in range(0, len(listaALimpiar)):
+                if not (indice % 2):
                     listaSinPares.append(listaALimpiar[indice])
             return listaSinPares
         else:
             return listaALimpiar
 
-    def recortarImpares(self,listaALimpiar):
+    def recortarImpares(self, listaALimpiar):
         listaSinImpares = []
         if len(listaALimpiar) >= MAX_WAYPOINTS:
-            for indice in range(0,len(listaALimpiar)):
+            for indice in range(0, len(listaALimpiar)):
                 if indice % 2:
                     listaSinImpares.append(listaALimpiar[indice])
             return listaSinImpares
         else:
             return listaALimpiar
+
+    def distanciaEuclidiana(self, puntoA, puntoB):
+        return math.sqrt(
+            ((puntoA.latitud - puntoB.latitud) ** 2)
+            +
+            ((puntoA.longitud - puntoB.longitud) ** 2))
+
+    def porVecinosIntercalados(self, listaDePuntos, origen, destino):
+        #Se obtienen todos los vecinos con las respectivas distancias
+        listaPuntosConDistancias = []
+        for punto in listaDePuntos:
+            puntoAux = Punto()
+            puntoAux.latitud = punto.latitud
+            puntoAux.longitud = punto.longitud
+            puntoAux.distanciaOrigen = self.distanciaEuclidiana(puntoAux, origen)
+            puntoAux.distanciaDestino = self.distanciaEuclidiana(puntoAux, destino)
+            listaPuntosConDistancias.append(punto)
+        listaOrdenadaOrigen = sorted(listaPuntosConDistancias, key=attrgetter('distanciaOrigen'), reverse=False)
+        listaOrdenadaDestino = sorted(listaPuntosConDistancias, key=attrgetter('distanciaDestino'), reverse=False)
+        listaFinal = np.zeros((0, 100))
+        while len(listaFinal) >= MAX_WAYPOINTS:
+            listaOrdenadaOrigen = self.recortarPares(listaOrdenadaOrigen)
+            listaOrdenadaDestino = self.recortarImpares(listaOrdenadaDestino)
+            listaFinal = list((set(listaOrdenadaOrigen) - set(listaOrdenadaDestino)) | (
+            set(listaOrdenadaDestino) - set(listaOrdenadaOrigen)))
+        return listaFinal
