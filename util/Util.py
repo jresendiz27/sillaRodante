@@ -208,7 +208,7 @@ class Util:
             puntoAux.longitud = punto.longitud
             puntoAux.distanciaOrigen = self.distanciaEuclidiana(puntoAux, origen)
             puntoAux.distanciaDestino = self.distanciaEuclidiana(puntoAux, destino)
-            listaPuntosConDistancias.append(punto)
+            listaPuntosConDistancias.append(puntoAux)
         listaOrdenadaOrigen = sorted(listaPuntosConDistancias, key=attrgetter('distanciaOrigen'), reverse=False)
         listaOrdenadaDestino = sorted(listaPuntosConDistancias, key=attrgetter('distanciaDestino'), reverse=False)
         listaFinal = np.zeros((0, 100))
