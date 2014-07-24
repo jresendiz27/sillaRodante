@@ -23,7 +23,7 @@ MAIN_PAGE = Template("""\
             <hr>
             Mensaje del Sistema : $mensaje
             <hr>
-            <h2>Formulario de carga </h2>
+            <h2>Formulario de caaarga </h2>
             $formularioACargar
             <hr>
             <h2>Formulario de consulta </h2>
