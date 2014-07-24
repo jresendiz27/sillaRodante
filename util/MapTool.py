@@ -19,7 +19,7 @@ class MapTool:
             "sensor": "false",
             "alternatives": "true",
             #"optimize":"true", #para evitar que las rutas sean medio weird ...
-            "mode": "bicycling"  #Para evitar rutas que tengan que ver con automoviles
+            "mode": "walking"  #Para evitar rutas que tengan que ver con automoviles
         }
         #Se generan los puntos a pasar en forma de cadena
         waypointsCadena = ""
