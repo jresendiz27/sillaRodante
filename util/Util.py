@@ -8,7 +8,7 @@ import numpy as np
 from modelos.PuntoClave import PuntoClave
 from util.Punto import Punto
 
-MAX_WAYPOINTS = 8
+MAX_WAYPOINTS = 4
 
 
 class Util:
@@ -211,11 +211,13 @@ class Util:
             listaPuntosConDistancias.append(puntoAux)
         listaOrdenadaOrigen = sorted(listaPuntosConDistancias, key=attrgetter('distanciaOrigen'), reverse=False)
         listaOrdenadaDestino = sorted(listaPuntosConDistancias, key=attrgetter('distanciaDestino'), reverse=False)
-        listaFinal = np.zeros(100)
-        while len(listaFinal) >= MAX_WAYPOINTS:
+        listaFinal = []
+        while True:
             listaOrdenadaOrigen = self.recortarPares(listaOrdenadaOrigen)
             listaOrdenadaDestino = self.recortarImpares(listaOrdenadaDestino)
             listaFinal = list((set(listaOrdenadaOrigen + listaOrdenadaDestino)))
+            if len(listaFinal) <= MAX_WAYPOINTS:
+                break
             logger.error(len(listaFinal))
         logger.info("--------------------------------")
         logger.info("--------------------------------")
