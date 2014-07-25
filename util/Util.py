@@ -8,7 +8,7 @@ import numpy as np
 from modelos.PuntoClave import PuntoClave
 from util.Punto import Punto
 
-MAX_WAYPOINTS = 5
+MAX_WAYPOINTS = 4
 
 
 class Util:
