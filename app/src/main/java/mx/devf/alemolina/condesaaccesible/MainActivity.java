@@ -107,6 +107,8 @@ public class MainActivity extends FragmentActivity {
             @Override
             public void latLngReady(RouteResult routeResult) {
 
+
+                mMap.clear();
                 drawRoute(routeResult.getRoute());
                 drawDots(routeResult.getDots());
                 drawRoute2(routeResult.getRoute2());
