@@ -25,10 +25,10 @@ import java.util.List;
 /**
  * Created by alemolina on 7/22/14.
  */
-public class GetPointsInRoute extends AsyncTask<LatLng, Integer, ArrayList<LatLng>> {
+public class GetPointsInRoute extends AsyncTask<LatLng, Integer, RouteResult> {
 
     protected interface OnPathListener {
-        public void latLngReady(ArrayList<LatLng> latlng);
+        public void latLngReady(RouteResult routeResult);
     }
 
     private OnPathListener listener;
@@ -38,22 +38,22 @@ public class GetPointsInRoute extends AsyncTask<LatLng, Integer, ArrayList<LatLn
     }
 
     @Override
-    protected ArrayList<LatLng> doInBackground(LatLng... latlngs) {
+    protected RouteResult doInBackground(LatLng... latlngs) {
         return postData(latlngs[0], latlngs[1]);
     }
 
-    protected void onPostExecute(ArrayList<LatLng> result) {
+    protected void onPostExecute(RouteResult result) {
         listener.latLngReady(result);
     }
 
     protected void onProgressUpdate(Integer... progress) {
         //pb.setProgress(progress[0]);
     }
-
-    public ArrayList<LatLng> postData(LatLng origin, LatLng destination) {
+    //"http://pepo27devf.appspot.com/obtenerRutas"
+    public RouteResult postData(LatLng origin, LatLng destination) {
         // Create a new HttpClient and Post Header
         HttpClient httpclient = new DefaultHttpClient();
-        HttpPost httppost = new HttpPost("http://pepo27devf.appspot.com/obtenerRutas");
+        HttpPost httppost = new HttpPost("http://172.16.170.115:8080/obtenerRutas");
 
         try {
             // Add your data
@@ -76,13 +76,41 @@ public class GetPointsInRoute extends AsyncTask<LatLng, Integer, ArrayList<LatLn
             Log.i(MainActivity.TAG, "JSON Result: "+responseString);
 
             JSONObject jsonRoute = new JSONObject(responseString);
+
+
+            JSONArray keyPoints = jsonRoute.getJSONArray("puntosClave");
+
+            ArrayList<PlaceDot> placeDots = new ArrayList<PlaceDot>();
+           for (int i=0;i<keyPoints.length();i++){
+
+              JSONObject keyPoint = keyPoints.getJSONObject(i);
+
+              double longitud = keyPoint.getDouble("longitud");
+              double latitud= keyPoint.getDouble("latitud");
+              int score = keyPoint.getInt("tipo");
+
+               PlaceDot placeDot = new PlaceDot();
+               placeDot.setScore(score);
+               placeDot.setPlace(new LatLng(latitud,longitud));
+
+               placeDots.add(placeDot);
+
+           }
+
+
             JSONObject possibleRoutes = jsonRoute.getJSONObject("rutasPosibles");
             JSONArray routes = possibleRoutes.getJSONArray("routes");
             JSONObject firstRoute = routes.getJSONObject(0);
             JSONObject overviewPolyline = firstRoute.getJSONObject("overview_polyline");
             String encodedPolyline = overviewPolyline.getString("points");
 
-            return decodePoly(encodedPolyline);
+            ArrayList<LatLng> route = decodePoly(encodedPolyline);
+
+            RouteResult routeResult = new RouteResult();
+            routeResult.setDots(placeDots);
+            routeResult.setRoute(route);
+
+            return routeResult;
 
 
         } catch (ClientProtocolException e) {

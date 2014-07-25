@@ -105,16 +105,47 @@ public class MainActivity extends FragmentActivity {
         GetPointsInRoute pointService = new GetPointsInRoute();
         pointService.setListener(new GetPointsInRoute.OnPathListener() {
             @Override
-            public void latLngReady(ArrayList<LatLng> pointsInPath) {
-                PolylineOptions polyLineOptions = new PolylineOptions();
-                polyLineOptions.addAll(pointsInPath);
-                polyLineOptions.width(5);
-                polyLineOptions.color(Color.BLUE);
-                mMap.addPolyline(polyLineOptions);
+            public void latLngReady(RouteResult routeResult) {
+
+                drawRoute(routeResult.getRoute());
+                drawDots(routeResult.getDots());
+
             }
         });
         pointService.execute(origin, destination);
+    }
 
+    private void drawDots(ArrayList<PlaceDot> dots) {
+        for (int i=0; i<dots.size(); i++){
+            PlaceDot placeDot = dots.get(i);
+            String title;
+            BitmapDescriptor hue;
+
+            if (4 == placeDot.getScore()) {
+                title = "Rampa";
+                hue = BitmapDescriptorFactory.fromResource(R.drawable.dot_green);
+            } else if (3 == placeDot.getScore()) {
+                title = "Camino";
+                hue = BitmapDescriptorFactory.fromResource(R.drawable.dot_blue);
+            } else if (2 == placeDot.getScore()) {
+                title = "Alerta";
+                hue = BitmapDescriptorFactory.fromResource(R.drawable.dot_yellow);
+            } else {
+                title = "Impasable";
+                hue = BitmapDescriptorFactory.fromResource(R.drawable.dot_red);
+            }
+            // Drops a marker in the current location.
+            mMap.addMarker(new MarkerOptions().position(placeDot.getPlace()).title(title).icon(hue).anchor(0.5f,0.5f));
+        }
+    }
+
+    private void drawRoute(ArrayList<LatLng> route) {
+
+        PolylineOptions polyLineOptions = new PolylineOptions();
+        polyLineOptions.addAll(route);
+        polyLineOptions.width(5);
+        polyLineOptions.color(Color.BLUE);
+        mMap.addPolyline(polyLineOptions);
 
     }
 
