@@ -82,8 +82,8 @@ public class MainActivity extends FragmentActivity {
                 latlngService.setListener(new GetLatLngFromId.OnLatLngListener() {
                     @Override
                     public void latLngReady(LatLng destination) {
-                       setDestinationPin(destination, placeName);
-                       drawPath(latlng, destination);
+                        setDestinationPin(destination, placeName);
+                        drawPath(latlng, destination);
                     }
                 });
                 latlngService.execute(placeId);
@@ -101,23 +101,34 @@ public class MainActivity extends FragmentActivity {
         mMap.addMarker(new MarkerOptions().position(latlng).title(placeName).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
     }
 
-    private void drawPath(LatLng origin, LatLng destination){
+    private void drawPath(LatLng origin, LatLng destination) {
         GetPointsInRoute pointService = new GetPointsInRoute();
         pointService.setListener(new GetPointsInRoute.OnPathListener() {
             @Override
             public void latLngReady(RouteResult routeResult) {
+                try {
+                    drawRoute2(routeResult.getRoute2());
+                    drawRoute(routeResult.getRoute());
+                    drawDots(routeResult.getDots());
 
-                drawRoute(routeResult.getRoute());
-                drawDots(routeResult.getDots());
-                drawRoute2(routeResult.getRoute2());
-
+                } catch (Exception e) {
+                    String cadena = "";
+                    Log.e(cadena, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+                    Log.e(cadena, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+                    Log.e(cadena, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+                    Log.e(cadena, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+                    e.printStackTrace();
+                    Log.e(cadena, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+                    Log.e(cadena, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+                    Log.e(cadena, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+                }
             }
         });
         pointService.execute(origin, destination);
     }
 
     private void drawDots(ArrayList<PlaceDot> dots) {
-        for (int i=0; i<dots.size(); i++){
+        for (int i = 0; i < dots.size(); i++) {
             PlaceDot placeDot = dots.get(i);
             String title;
             BitmapDescriptor hue;
@@ -136,7 +147,7 @@ public class MainActivity extends FragmentActivity {
                 hue = BitmapDescriptorFactory.fromResource(R.drawable.dot_red);
             }
             // Drops a marker in the current location.
-            mMap.addMarker(new MarkerOptions().position(placeDot.getPlace()).title(title).icon(hue).anchor(0.5f,0.5f));
+            mMap.addMarker(new MarkerOptions().position(placeDot.getPlace()).title(title).icon(hue).anchor(0.5f, 0.5f));
         }
     }
 
@@ -159,7 +170,6 @@ public class MainActivity extends FragmentActivity {
         mMap.addPolyline(polyLineOptions);
 
     }
-
 
 
     @Override
@@ -192,7 +202,7 @@ public class MainActivity extends FragmentActivity {
             score = 1;
         }
         // Drops a marker in the current location.
-        mMap.addMarker(new MarkerOptions().position(latlng).title(title).icon(hue).anchor(0.5f,0.5f));
+        mMap.addMarker(new MarkerOptions().position(latlng).title(title).icon(hue).anchor(0.5f, 0.5f));
         // Send score to backend
         sendScore(score, latlng);
     }
@@ -259,13 +269,12 @@ public class MainActivity extends FragmentActivity {
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
 
 
-
     }
 
     private void makeUseOfNewLocation(Location location) {
         boolean shouldMoveMap = latlng == null;
         latlng = new LatLng(location.getLatitude(), location.getLongitude());
-        if(shouldMoveMap){
+        if (shouldMoveMap) {
             mMap.addMarker(new MarkerOptions().position(latlng).title("Aqui estas"));
             mMap.moveCamera(CameraUpdateFactory.newLatLng(latlng));
         }

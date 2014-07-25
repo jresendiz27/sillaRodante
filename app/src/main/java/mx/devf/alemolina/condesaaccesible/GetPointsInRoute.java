@@ -49,6 +49,7 @@ public class GetPointsInRoute extends AsyncTask<LatLng, Integer, RouteResult> {
     protected void onProgressUpdate(Integer... progress) {
         //pb.setProgress(progress[0]);
     }
+
     //"http://pepo27devf.appspot.com/obtenerRutas"
     public RouteResult postData(LatLng origin, LatLng destination) {
         // Create a new HttpClient and Post Header
@@ -66,14 +67,14 @@ public class GetPointsInRoute extends AsyncTask<LatLng, Integer, RouteResult> {
 
             httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
-            Log.i(MainActivity.TAG, "URL: "+httppost.getURI());
+            Log.e(MainActivity.TAG, "URL: " + httppost.getURI());
 
             // Execute HTTP Post Request
             HttpResponse response = httpclient.execute(httppost);
 
             String responseString = new BasicResponseHandler().handleResponse(response);
 
-            Log.i(MainActivity.TAG, "JSON Result: "+responseString);
+            Log.e(MainActivity.TAG, "JSON Result: " + responseString);
 
             JSONObject jsonRoute = new JSONObject(responseString);
 
@@ -81,21 +82,21 @@ public class GetPointsInRoute extends AsyncTask<LatLng, Integer, RouteResult> {
             JSONArray keyPoints = jsonRoute.getJSONArray("puntosClave");
 
             ArrayList<PlaceDot> placeDots = new ArrayList<PlaceDot>();
-           for (int i=0;i<keyPoints.length();i++){
+            for (int i = 0; i < keyPoints.length(); i++) {
 
-              JSONObject keyPoint = keyPoints.getJSONObject(i);
+                JSONObject keyPoint = keyPoints.getJSONObject(i);
 
-              double longitud = keyPoint.getDouble("longitud");
-              double latitud= keyPoint.getDouble("latitud");
-              int score = keyPoint.getInt("tipo");
+                double longitud = keyPoint.getDouble("longitud");
+                double latitud = keyPoint.getDouble("latitud");
+                int score = keyPoint.getInt("tipo");
 
-               PlaceDot placeDot = new PlaceDot();
-               placeDot.setScore(score);
-               placeDot.setPlace(new LatLng(latitud,longitud));
+                PlaceDot placeDot = new PlaceDot();
+                placeDot.setScore(score);
+                placeDot.setPlace(new LatLng(latitud, longitud));
 
-               placeDots.add(placeDot);
+                placeDots.add(placeDot);
 
-           }
+            }
 
 
             JSONObject possibleRoutes = jsonRoute.getJSONObject("rutaPropuesta");
@@ -113,24 +114,24 @@ public class GetPointsInRoute extends AsyncTask<LatLng, Integer, RouteResult> {
             String encodedPolyline2 = overviewPolyline2.getString("points");
 
 
-            ArrayList<LatLng> route2= decodePoly(encodedPolyline2);
+            ArrayList<LatLng> route2 = decodePoly(encodedPolyline2);
 
             RouteResult routeResult = new RouteResult();
-            routeResult.setDots(placeDots);
             routeResult.setRoute(route);
             routeResult.setRoute2(route2);
-
+            routeResult.setDots(placeDots);
             return routeResult;
-
-
-
-
-        } catch (ClientProtocolException e) {
-            // TODO Auto-generated catch block
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-        } catch (JSONException e) {
+        } catch (Exception e) {
             e.printStackTrace();
+            Log.e(MainActivity.TAG, ">>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<");
+            Log.e(MainActivity.TAG, ">>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<");
+            Log.e(MainActivity.TAG, ">>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<");
+            Log.e(MainActivity.TAG, ">>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<");
+            e.printStackTrace();
+            Log.e(MainActivity.TAG, ">>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<");
+            Log.e(MainActivity.TAG, ">>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<");
+            Log.e(MainActivity.TAG, ">>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<");
+            Log.e(MainActivity.TAG, ">>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<");
         }
         return null;
     }
