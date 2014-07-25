@@ -81,7 +81,11 @@ class Util:
                 puntosFiltro1)
 
             #Se eliminan los que son de tipo 1 (rojo)
-            puntosFiltradosPorTipo = filter(lambda punto: not(punto.tipo is 1))
+            puntosFiltradosPorTipo = filter(lambda punto: punto.tipo <> 1,puntosFiltrados)
+            logger.warn("--------------------PUNTOS FILTRADOS POR TIPO--------------------")
+            for elemento in puntosFiltradosPorTipo:
+                logger.info(elemento)
+            logger.warn("--------------------PUNTOS FILTRADOS POR TIPO--------------------")
             #Se procede a ordenar por el tipo y luego por el valor del mismo
             puntosOrdenadosPorTipo = sorted(puntosFiltradosPorTipo, key=attrgetter('tipo', 'valoracion'), reverse=True)
             return puntosOrdenadosPorTipo
