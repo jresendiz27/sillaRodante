@@ -8,7 +8,7 @@ import numpy as np
 from modelos.PuntoClave import PuntoClave
 from util.Punto import Punto
 
-MAX_WAYPOINTS = 4
+MAX_WAYPOINTS = 5
 
 
 class Util:
@@ -23,7 +23,7 @@ class Util:
         puntosMasLejanos['latitudMinima'] = 0.0
         puntosMasLejanos['longitudMinima'] = 0.0
         # Se considera una diferencia de 0.0001 para los rangos, Gracias a Ricardo por ayudar a determinar la ubicacion del punto
-        diferencia = 0.03
+        diferencia = 0.0003
         #Se determina la ubicacion por una comparacio, gracias a Joaquin por ayudar a la visualizacion de los puntos en un plano x,y
         if punto1.latitud >= punto2.latitud:
             #Punto 1 arriba de punto 2
@@ -209,15 +209,19 @@ class Util:
             puntoAux.distanciaOrigen = self.distanciaEuclidiana(puntoAux, origen)
             puntoAux.distanciaDestino = self.distanciaEuclidiana(puntoAux, destino)
             listaPuntosConDistancias.append(puntoAux)
-        listaOrdenadaOrigen = sorted(listaPuntosConDistancias, key=attrgetter('distanciaOrigen'), reverse=False)
-        listaOrdenadaDestino = sorted(listaPuntosConDistancias, key=attrgetter('distanciaDestino'), reverse=False)
+        listaOrdenadaOrigen = sorted(listaPuntosConDistancias, key=attrgetter('distanciaOrigen'), reverse=True)
+        listaOrdenadaDestino = sorted(listaPuntosConDistancias, key=attrgetter('distanciaDestino'), reverse=True)
         listaFinal = []
+        valorPrevio = 0
         while True:
             listaOrdenadaOrigen = self.recortarPares(listaOrdenadaOrigen)
-            listaOrdenadaDestino = self.recortarImpares(listaOrdenadaDestino)
+            listaOrdenadaDestino = self.recortarPares(listaOrdenadaDestino)
             listaFinal = list((set(listaOrdenadaOrigen + listaOrdenadaDestino)))
-            if len(listaFinal) <= MAX_WAYPOINTS:
+            valorPrevio = 0
+            if (len(listaFinal) <= MAX_WAYPOINTS) or (len(listaFinal) is valorPrevio):
                 break
+            else:
+                valorPrevio = len(listaFinal)
             logger.error(len(listaFinal))
         logger.info("--------------------------------")
         logger.info("--------------------------------")
