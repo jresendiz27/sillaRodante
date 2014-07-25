@@ -109,6 +109,7 @@ public class MainActivity extends FragmentActivity {
 
                 drawRoute(routeResult.getRoute());
                 drawDots(routeResult.getDots());
+                drawRoute2(routeResult.getRoute2());
 
             }
         });
@@ -148,6 +149,18 @@ public class MainActivity extends FragmentActivity {
         mMap.addPolyline(polyLineOptions);
 
     }
+
+    private void drawRoute2(ArrayList<LatLng> route2) {
+
+        PolylineOptions polyLineOptions = new PolylineOptions();
+        polyLineOptions.addAll(route2);
+        polyLineOptions.width(10);
+        polyLineOptions.color(Color.GREEN);
+        mMap.addPolyline(polyLineOptions);
+
+    }
+
+
 
     @Override
     protected void onResume() {

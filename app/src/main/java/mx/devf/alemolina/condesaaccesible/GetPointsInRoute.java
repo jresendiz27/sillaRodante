@@ -53,7 +53,7 @@ public class GetPointsInRoute extends AsyncTask<LatLng, Integer, RouteResult> {
     public RouteResult postData(LatLng origin, LatLng destination) {
         // Create a new HttpClient and Post Header
         HttpClient httpclient = new DefaultHttpClient();
-        HttpPost httppost = new HttpPost("http://172.16.170.115:8080/obtenerRutas");
+        HttpPost httppost = new HttpPost("http://pepo27devf.appspot.com/obtenerRutas");
 
         try {
             // Add your data
@@ -98,7 +98,7 @@ public class GetPointsInRoute extends AsyncTask<LatLng, Integer, RouteResult> {
            }
 
 
-            JSONObject possibleRoutes = jsonRoute.getJSONObject("rutasPosibles");
+            JSONObject possibleRoutes = jsonRoute.getJSONObject("rutaPropuesta");
             JSONArray routes = possibleRoutes.getJSONArray("routes");
             JSONObject firstRoute = routes.getJSONObject(0);
             JSONObject overviewPolyline = firstRoute.getJSONObject("overview_polyline");
@@ -106,11 +106,23 @@ public class GetPointsInRoute extends AsyncTask<LatLng, Integer, RouteResult> {
 
             ArrayList<LatLng> route = decodePoly(encodedPolyline);
 
+            JSONObject possibleRoutes2 = jsonRoute.getJSONObject("rutaMaps");
+            JSONArray routes2 = possibleRoutes2.getJSONArray("routes");
+            JSONObject firstRoute2 = routes2.getJSONObject(0);
+            JSONObject overviewPolyline2 = firstRoute2.getJSONObject("overview_polyline");
+            String encodedPolyline2 = overviewPolyline2.getString("points");
+
+
+            ArrayList<LatLng> route2= decodePoly(encodedPolyline2);
+
             RouteResult routeResult = new RouteResult();
             routeResult.setDots(placeDots);
             routeResult.setRoute(route);
+            routeResult.setRoute2(route2);
 
             return routeResult;
+
+
 
 
         } catch (ClientProtocolException e) {
