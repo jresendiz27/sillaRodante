@@ -6,5 +6,3 @@ indexes:
     direction: asc
   - name: longitud
     direction: asc
-  - name: tipo
-    direction: asc
