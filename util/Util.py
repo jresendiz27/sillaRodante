@@ -216,7 +216,6 @@ class Util:
             listaOrdenadaOrigen = self.recortarPares(listaOrdenadaOrigen)
             listaOrdenadaDestino = self.recortarPares(listaOrdenadaDestino)
             listaFinal = list((set(listaOrdenadaOrigen + listaOrdenadaDestino)))
-            valorPrevio = 0
             if (len(listaFinal) <= MAX_WAYPOINTS) or (len(listaFinal) is valorPrevio):
                 break
             else:
