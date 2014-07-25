@@ -79,8 +79,11 @@ class Util:
             puntosFiltrados = filter(
                 lambda punto: punto.longitud <= rangos['longitudMaxima'] and punto.longitud >= rangos['longitudMinima'],
                 puntosFiltro1)
+
+            #Se eliminan los que son de tipo 1 (rojo)
+            puntosFiltradosPorTipo = filter(lambda punto: not(punto.tipo is 1))
             #Se procede a ordenar por el tipo y luego por el valor del mismo
-            puntosOrdenadosPorTipo = sorted(puntosFiltrados, key=attrgetter('tipo', 'valoracion'), reverse=True)
+            puntosOrdenadosPorTipo = sorted(puntosFiltradosPorTipo, key=attrgetter('tipo', 'valoracion'), reverse=True)
             return puntosOrdenadosPorTipo
         except Exception as e:
             logger.error("No se pudieron obtener los puntos")
