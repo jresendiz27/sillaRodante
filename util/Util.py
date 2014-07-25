@@ -79,15 +79,7 @@ class Util:
             puntosFiltrados = filter(
                 lambda punto: punto.longitud <= rangos['longitudMaxima'] and punto.longitud >= rangos['longitudMinima'],
                 puntosFiltro1)
-
-            #Se eliminan los que son de tipo 1 (rojo)
-            puntosFiltradosPorTipo = filter(lambda punto: punto.tipo <> 1,puntosFiltrados)
-            logger.warn("--------------------PUNTOS FILTRADOS POR TIPO--------------------")
-            for elemento in puntosFiltradosPorTipo:
-                logger.info(elemento)
-            logger.warn("--------------------PUNTOS FILTRADOS POR TIPO--------------------")
-            #Se procede a ordenar por el tipo y luego por el valor del mismo
-            puntosOrdenadosPorTipo = sorted(puntosFiltradosPorTipo, key=attrgetter('tipo', 'valoracion'), reverse=True)
+            puntosOrdenadosPorTipo = sorted(puntosFiltrados, key=attrgetter('tipo', 'valoracion'), reverse=True)
             return puntosOrdenadosPorTipo
         except Exception as e:
             logger.error("No se pudieron obtener los puntos")
@@ -239,6 +231,13 @@ class Util:
         logger.info("--------------------------------")
         logger.info("--------------------------------")
         logger.info("--------------------------------")
+        #Se eliminan los que son de tipo 1 (rojo)
+        listaFinal = filter(lambda punto: punto.tipo <> 1,listaFinal)
+        logger.warn("--------------------PUNTOS FILTRADOS POR TIPO--------------------")
+        for elemento in listaFinal:
+            logger.info(elemento)
+        logger.warn("--------------------PUNTOS FILTRADOS POR TIPO--------------------")
+        #Se procede a ordenar por el tipo y luego por el valor del mismo
         return listaFinal
     def imprimirLista(lista):
         for objeto in lista:
