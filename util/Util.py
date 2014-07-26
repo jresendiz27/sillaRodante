@@ -207,6 +207,7 @@ class Util:
             puntoAux.longitud = punto.longitud
             puntoAux.distanciaOrigen = self.distanciaEuclidiana(puntoAux, origen)
             puntoAux.distanciaDestino = self.distanciaEuclidiana(puntoAux, destino)
+            puntoAux.tipo = punto.tipo
             listaPuntosConDistancias.append(puntoAux)
         listaOrdenadaOrigen = sorted(listaPuntosConDistancias, key=attrgetter('distanciaOrigen'), reverse=True)
         listaOrdenadaDestino = sorted(listaPuntosConDistancias, key=attrgetter('distanciaDestino'), reverse=True)

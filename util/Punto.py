@@ -5,6 +5,7 @@ class Punto:
         self.distanciaOrigen = 0.0
         self.distanciaDestino = 0.0
         self.distanciaTotal = self.distanciaOrigen + self.distanciaDestino
+        self.tipo = 0
 
     def __str__(self):
         return "%s,%s" % (self.latitud, self.longitud)
