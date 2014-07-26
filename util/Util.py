@@ -181,7 +181,7 @@ class Util:
             return listaSinPares
         else:
             return listaALimpiar
-
+#####
     def recortarImpares(self, listaALimpiar):
         listaSinImpares = []
         if len(listaALimpiar) >= MAX_WAYPOINTS:
