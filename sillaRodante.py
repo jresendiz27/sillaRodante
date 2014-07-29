@@ -113,7 +113,7 @@ class GuardarPuntosClavePage(webapp2.RequestHandler):
 class MostrarPuntosClavePage(webapp2.RequestHandler):
     def get(self):
         utileria = Util()
-        listadoDePuntos = utileria.obtenerPuntos(self.request,0.03)
+        listadoDePuntos = utileria.obtenerPuntosArea(self.request,0.03)
         jsonAMostrar = json.dumps([punto.to_dict() for punto in listadoDePuntos])
         self.response.write(jsonAMostrar)
 

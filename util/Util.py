@@ -85,7 +85,7 @@ class Util:
             logger.error("No se pudieron obtener los puntos")
             logger.error(e)
         return puntosOrdenadosPorTipo
-    def obtenerPuntos(self,request,radio):
+    def obtenerPuntosArea(self,request,radio):
         punto1 = Punto()
         puntosFiltrados = []
         try:
