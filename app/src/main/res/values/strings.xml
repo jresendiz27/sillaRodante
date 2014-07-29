@@ -9,5 +9,6 @@
     <string name="buttonYellowLabel">Yellow</string>
     <string name="buttonRedLabel">Red</string>
     <string name="autocompletePlaceholder">¿A dónde quieres ir?</string>
+    <string name="mapCenterName">mapCenter</string>
 
 </resources>

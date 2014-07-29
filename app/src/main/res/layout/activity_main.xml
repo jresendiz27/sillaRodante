@@ -16,7 +16,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|bottom"
         android:id="@+id/button_container"
-        android:padding="12dp">
+        android:padding="12dp"
+        android:visibility="invisible">
 
         <Button
             style="?android:attr/buttonStyleSmall"
@@ -51,6 +52,7 @@
             android:id="@+id/buttonRed"
             android:background="@drawable/button_red"
             android:width="48dp" />
+
     </TableRow>
 
     <TableRow
@@ -72,5 +74,29 @@
             android:background="@drawable/abc_search_dropdown_light"
             android:padding="6dp" />
     </TableRow>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Reportar"
+        android:id="@+id/buttonReport"
+        android:layout_gravity="bottom|right" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cancelar"
+        android:id="@+id/buttonCancel"
+        android:layout_gravity="bottom|right"
+        android:visibility="invisible" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/mapCenter"
+        android:layout_gravity="center"
+        android:src="@drawable/center_map"
+        android:visibility="invisible"
+        android:contentDescription="@string/mapCenterName" />
 
 </FrameLayout>

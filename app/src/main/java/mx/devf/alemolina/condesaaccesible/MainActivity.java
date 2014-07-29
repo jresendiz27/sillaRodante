@@ -12,6 +12,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TableRow;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -19,6 +21,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
@@ -35,12 +38,19 @@ public class MainActivity extends FragmentActivity {
     private Button buttonYellow;
     private Button buttonRed;
 
+    private Button buttonReport;
+    private Button buttonCancel;
+    private TableRow buttonContainer;
+
+    private Marker markerStart;
+    private Marker markerEnd;
     private View.OnClickListener buttonListener;
 
     public static final String TAG = "CondesaAccesible";
 
     // Definition of "latlng" which will contain current location information.
     private LatLng latlng;
+    private ImageView centerMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +77,27 @@ public class MainActivity extends FragmentActivity {
         buttonBlue.setOnClickListener(buttonListener);
         buttonYellow.setOnClickListener(buttonListener);
         buttonRed.setOnClickListener(buttonListener);
+
+        buttonReport = (Button) findViewById(R.id.buttonReport);
+        buttonCancel = (Button) findViewById(R.id.buttonCancel);
+        buttonContainer = (TableRow) findViewById(R.id.button_container);
+
+        centerMap = (ImageView) findViewById(R.id.mapCenter);
+        buttonReport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showReportButtons(true);
+                mMap.animateCamera(CameraUpdateFactory.newLatLng(latlng));
+            }
+        });
+
+        buttonCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showReportButtons(false);
+            }
+        });
+
 
 
         AutoCompleteTextView autoCompView = (AutoCompleteTextView) findViewById(R.id.autocompleteView);
@@ -95,13 +126,24 @@ public class MainActivity extends FragmentActivity {
         Log.i(TAG, "ADIOS");
     }
 
+    private void showReportButtons(boolean visible) {
+        int visibleFlag = visible ? View.VISIBLE : View.INVISIBLE;
+        int invisibleFlag = visible ? View.INVISIBLE : View.VISIBLE;
+
+        buttonReport.setVisibility(invisibleFlag);
+        buttonCancel.setVisibility(visibleFlag);
+        buttonContainer.setVisibility(visibleFlag);
+        centerMap.setVisibility(visibleFlag);
+    }
+
     private void setDestinationPin(LatLng latlng, String placeName) {
         //Log.i(TAG, latlng.toString());
         mMap.animateCamera(CameraUpdateFactory.newLatLng(latlng));
-        mMap.addMarker(new MarkerOptions().position(latlng).title(placeName).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+        markerEnd = mMap.addMarker(new MarkerOptions().position(latlng).title(placeName).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
     }
 
     private void drawPath(LatLng origin, LatLng destination) {
+        markerEnd = mMap.addMarker(new MarkerOptions().position(latlng).title("Inicio").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
         GetPointsInRoute pointService = new GetPointsInRoute();
         pointService.setListener(new GetPointsInRoute.OnPathListener() {
             @Override
@@ -202,9 +244,11 @@ public class MainActivity extends FragmentActivity {
             score = 1;
         }
         // Drops a marker in the current location.
-        mMap.addMarker(new MarkerOptions().position(latlng).title(title).icon(hue).anchor(0.5f, 0.5f));
+        mMap.addMarker(new MarkerOptions().position(getCenter()).title(title).icon(hue).anchor(0.5f, 0.5f));
         // Send score to backend
         sendScore(score, latlng);
+
+        showReportButtons(false);
     }
 
     /**
@@ -235,6 +279,10 @@ public class MainActivity extends FragmentActivity {
         }
     }
 
+    private LatLng getCenter(){
+        return mMap.getCameraPosition().target;
+    }
+
     /**
      * This is where we can add markers or lines, add listeners or move the camera. In this case, we
      * just add a marker near Africa.
@@ -244,7 +292,7 @@ public class MainActivity extends FragmentActivity {
     private void setUpMap() {
         mMap.moveCamera(CameraUpdateFactory.zoomTo(16));
         mMap.setMyLocationEnabled(true);
-
+        mMap.getUiSettings().setZoomControlsEnabled(false);
         LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
         // Define a listener that responds to location updates
@@ -275,7 +323,7 @@ public class MainActivity extends FragmentActivity {
         boolean shouldMoveMap = latlng == null;
         latlng = new LatLng(location.getLatitude(), location.getLongitude());
         if (shouldMoveMap) {
-            mMap.addMarker(new MarkerOptions().position(latlng).title("Aqui estas"));
+            //reportMarker = mMap.addMarker(new MarkerOptions().position(latlng).title("Reportar").visible(false).draggable(true));
             mMap.moveCamera(CameraUpdateFactory.newLatLng(latlng));
         }
     }
@@ -285,7 +333,7 @@ public class MainActivity extends FragmentActivity {
         try {
             HTTPTask task = new HTTPTask();
             task.setApplicationContext(getApplicationContext());
-            task.execute("" + latlng.latitude, "" + latlng.longitude, "" + score);
+            task.execute("" + getCenter().latitude, "" + getCenter().longitude, "" + score);
         } catch (Exception e) {
             Log.e(TAG, "error");
             e.printStackTrace();
