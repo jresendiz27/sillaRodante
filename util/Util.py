@@ -100,7 +100,7 @@ class Util:
             longitudMaxima = longitudOrigen + radio
             #
             latitudMinima = latitudOrigen - radio
-            longituMinima = longitudOrigen - radio
+            longitudMinima = longitudOrigen - radio
             puntosFiltro1 = PuntoClave.query(PuntoClave.latitud <= latitudMaxima,
                                              PuntoClave.latitud >= latitudMinima).fetch(100)
             #Se aplica un segundo filtro, limitantes de Datastore (NoSQL) por razones de indices.
