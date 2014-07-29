@@ -85,6 +85,34 @@ class Util:
             logger.error("No se pudieron obtener los puntos")
             logger.error(e)
         return puntosOrdenadosPorTipo
+    def obtenerPuntos(self,request,radio):
+        punto1 = Punto()
+        puntosFiltrados = []
+        try:
+            # Se obtiene la ubicacion del cliente
+            latitudOrigen = float(request.get('latitudOrigen'))
+            longitudOrigen = float(request.get('longitudOrigen'))
+            # se asigna la informacion al punto
+            punto1.latitud = latitudOrigen
+            punto1.longitud = longitudOrigen
+            #Se ejecuta la consulta con los parametros obtenidos, primero se filtra la latitud
+            latitudMaxima = latitudOrigen + radio
+            longitudMaxima = longitudOrigen + radio
+            #
+            latitudMinima = latitudOrigen - radio
+            longituMinima = longitudOrigen - radio
+            puntosFiltro1 = PuntoClave.query(PuntoClave.latitud <= latitudMaxima,
+                                             PuntoClave.latitud >= latitudMinima).fetch(100)
+            #Se aplica un segundo filtro, limitantes de Datastore (NoSQL) por razones de indices.
+            puntosFiltrados = filter(
+                lambda punto: punto.longitud <= longitudMaxima and punto.longitud >= longitudMinima,
+                puntosFiltro1)
+
+            return puntosFiltrados
+        except Exception as e:
+            logger.error("No se pudieron obtener los puntos")
+            logger.error(e)
+        return puntosFiltrados
 
     def lecturaProperties(self):
         valores = dict(line.strip().split('=') for line in open('passwords.properties'))
