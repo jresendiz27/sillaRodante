@@ -75,21 +75,6 @@
             android:padding="6dp" />
     </TableRow>
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Reportar"
-        android:id="@+id/buttonReport"
-        android:layout_gravity="bottom|right" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Cancelar"
-        android:id="@+id/buttonCancel"
-        android:layout_gravity="bottom|right"
-        android:visibility="invisible" />
-
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -98,5 +83,23 @@
         android:src="@drawable/center_map"
         android:visibility="invisible"
         android:contentDescription="@string/mapCenterName" />
+
+    <Button
+        android:layout_width="48dp"
+        android:layout_height="50dp"
+        android:id="@+id/buttonCancel"
+        android:layout_gravity="bottom|right"
+        android:visibility="invisible"
+        android:background="@drawable/button_cancel"
+        android:layout_margin="12dp" />
+
+    <Button
+        android:layout_width="48dp"
+        android:layout_height="50dp"
+        android:id="@+id/buttonReport"
+        android:layout_gravity="bottom|right"
+        android:background="@drawable/button_report"
+        android:visibility="visible"
+        android:layout_margin="12dp" />
 
 </FrameLayout>

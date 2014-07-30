@@ -9,6 +9,9 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.accessibility.AccessibilityNodeInfo;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -87,7 +90,6 @@ public class MainActivity extends FragmentActivity {
             @Override
             public void onClick(View v) {
                 showReportButtons(true);
-                mMap.animateCamera(CameraUpdateFactory.newLatLng(latlng));
             }
         });
 
@@ -126,24 +128,56 @@ public class MainActivity extends FragmentActivity {
         Log.i(TAG, "ADIOS");
     }
 
+    private Animation slideAnimation(final View view, final boolean slideUp) {
+        int animationId = slideUp ? R.anim.slide_up : R.anim.slide_down;
+        Animation animation = AnimationUtils.loadAnimation(this, animationId);
+        animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                view.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                view.setVisibility(slideUp ? View.VISIBLE : View.INVISIBLE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        view.startAnimation(animation);
+        return animation;
+    }
+
     private void showReportButtons(boolean visible) {
         int visibleFlag = visible ? View.VISIBLE : View.INVISIBLE;
         int invisibleFlag = visible ? View.INVISIBLE : View.VISIBLE;
 
-        buttonReport.setVisibility(invisibleFlag);
-        buttonCancel.setVisibility(visibleFlag);
-        buttonContainer.setVisibility(visibleFlag);
+
+        slideAnimation(buttonContainer, visible);
+        slideAnimation(buttonCancel, visible);
+        slideAnimation(buttonReport, !visible);
+
+        if(visible){
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlng, 19));
+        }
+        else{
+            mMap.animateCamera(CameraUpdateFactory.zoomTo(16));
+        }
+
         centerMap.setVisibility(visibleFlag);
     }
 
     private void setDestinationPin(LatLng latlng, String placeName) {
         //Log.i(TAG, latlng.toString());
         mMap.animateCamera(CameraUpdateFactory.newLatLng(latlng));
-        markerEnd = mMap.addMarker(new MarkerOptions().position(latlng).title(placeName).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+        markerEnd = mMap.addMarker(new MarkerOptions().position(latlng).title(placeName).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_end)));
     }
 
     private void drawPath(LatLng origin, LatLng destination) {
-        markerEnd = mMap.addMarker(new MarkerOptions().position(latlng).title("Inicio").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+        markerStart = mMap.addMarker(new MarkerOptions().position(latlng).title("Inicio").icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_start)));
         GetPointsInRoute pointService = new GetPointsInRoute();
         pointService.setListener(new GetPointsInRoute.OnPathListener() {
             @Override
@@ -194,23 +228,19 @@ public class MainActivity extends FragmentActivity {
     }
 
     private void drawRoute(ArrayList<LatLng> route) {
-
         PolylineOptions polyLineOptions = new PolylineOptions();
         polyLineOptions.addAll(route);
         polyLineOptions.width(5);
-        polyLineOptions.color(Color.BLUE);
+        polyLineOptions.color(0xFF0768F4);
         mMap.addPolyline(polyLineOptions);
-
     }
 
     private void drawRoute2(ArrayList<LatLng> route2) {
-
         PolylineOptions polyLineOptions = new PolylineOptions();
         polyLineOptions.addAll(route2);
         polyLineOptions.width(10);
-        polyLineOptions.color(Color.GREEN);
+        polyLineOptions.color(0xFF0DA331);
         mMap.addPolyline(polyLineOptions);
-
     }
 
 
