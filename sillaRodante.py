@@ -115,7 +115,9 @@ class MostrarPuntosClavePage(webapp2.RequestHandler):
         utileria = Util()
         listadoDePuntos = utileria.obtenerPuntosArea(self.request,0.03)
         jsonAMostrar = json.dumps([punto.to_dict() for punto in listadoDePuntos])
-        self.response.write(jsonAMostrar)
+        mapaRespuesta = {'puntosClave': [punto.to_dict() for punto in listadoDePuntos]}
+        self.response.headers['Content-Type'] = 'application/json; charset=utf-8'
+        self.response.write(json.dumps(mapaRespuesta))
 
     #self.redirect('/?' + urllib.urlencode(query_params))
     def post(self):
