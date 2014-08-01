@@ -10,6 +10,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
@@ -20,14 +21,19 @@ import java.util.List;
 /**
  * Created by alemolina on 7/18/14.
  */
-public class HTTPTask extends AsyncTask<String, Integer, Double> {
+public class HTTPTask extends AsyncTask<String, Integer, String> {
 
     private Context applicationContext;
 
     @Override
-    protected Double doInBackground(String... strings) {
-        postData(strings[0], strings[1], strings[2]);
-        return null;
+    protected String doInBackground(String... strings) {
+        if (strings[0].equals("sendScore")) {
+            return postData(strings);
+        } else if (strings[0].equals("getPoints")) {
+            return getPoints(strings);
+        } else {
+            return null;
+        }
     }
 
     protected void onPostExecute(Double result) {
@@ -39,18 +45,46 @@ public class HTTPTask extends AsyncTask<String, Integer, Double> {
         //pb.setProgress(progress[0]);
     }
 
-    public void postData(String latitud, String longitud, String tipo) {
+    public String getPoints(String[] parametros) {
         // Create a new HttpClient and Post Header
         HttpClient httpclient = new DefaultHttpClient();
-        HttpPost httppost = new HttpPost("http://pepo27devf.appspot.com/generarPunto");
+        HttpPost httppost = new HttpPost(parametros[1]);
+        String respuesta = "";
+        try {
+            // Add your data
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+
+            nameValuePairs.add(new BasicNameValuePair("latitudOrigen", parametros[2]));
+            nameValuePairs.add(new BasicNameValuePair("longitudOrigen", parametros[3]));
+
+            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+
+            // Execute HTTP Post Request
+            HttpResponse response = httpclient.execute(httppost);
+            respuesta  = new BasicResponseHandler().handleResponse(response);
+            return respuesta;
+
+        } catch (ClientProtocolException e) {
+            // TODO Auto-generated catch block
+            return  respuesta;
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            return respuesta;
+        }
+    }
+
+    public String postData(String[] parametros) {
+        // Create a new HttpClient and Post Header
+        HttpClient httpclient = new DefaultHttpClient();
+        HttpPost httppost = new HttpPost(parametros[1]);
 
         try {
             // Add your data
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 
-            nameValuePairs.add(new BasicNameValuePair("latitud", latitud));
-            nameValuePairs.add(new BasicNameValuePair("longitud", longitud));
-            nameValuePairs.add(new BasicNameValuePair("tipo", tipo));
+            nameValuePairs.add(new BasicNameValuePair("latitud", parametros[2]));
+            nameValuePairs.add(new BasicNameValuePair("longitud", parametros[3]));
+            nameValuePairs.add(new BasicNameValuePair("tipo", parametros[4]));
 
             httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
@@ -62,6 +96,7 @@ public class HTTPTask extends AsyncTask<String, Integer, Double> {
         } catch (IOException e) {
             // TODO Auto-generated catch block
         }
+        return null;
     }
 
     public Context getApplicationContext() {
