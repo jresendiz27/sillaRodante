@@ -1,15 +1,14 @@
 package mx.devf.alemolina.condesaaccesible;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.support.v4.app.FragmentActivity;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
-import android.view.accessibility.AccessibilityNodeInfo;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
@@ -23,6 +22,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -31,7 +31,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import java.util.ArrayList;
 
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends FragmentActivity implements GoogleMap.OnMapLoadedCallback {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
@@ -101,7 +101,6 @@ public class MainActivity extends FragmentActivity {
         });
 
 
-
         AutoCompleteTextView autoCompView = (AutoCompleteTextView) findViewById(R.id.autocompleteView);
         final PlacesAutoCompleteAdapter adapter = new PlacesAutoCompleteAdapter(this, R.layout.list_item);
         autoCompView.setAdapter(adapter);
@@ -160,10 +159,9 @@ public class MainActivity extends FragmentActivity {
         slideAnimation(buttonCancel, visible);
         slideAnimation(buttonReport, !visible);
 
-        if(visible){
+        if (visible) {
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlng, 19));
-        }
-        else{
+        } else {
             mMap.animateCamera(CameraUpdateFactory.zoomTo(16));
         }
 
@@ -183,6 +181,7 @@ public class MainActivity extends FragmentActivity {
             @Override
             public void latLngReady(RouteResult routeResult) {
                 try {
+                    mMap.clear();
                     drawRoute2(routeResult.getRoute2());
                     drawRoute(routeResult.getRoute());
                     drawDots(routeResult.getDots());
@@ -190,12 +189,7 @@ public class MainActivity extends FragmentActivity {
                 } catch (Exception e) {
                     String cadena = "";
                     Log.e(cadena, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-                    Log.e(cadena, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-                    Log.e(cadena, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-                    Log.e(cadena, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
                     e.printStackTrace();
-                    Log.e(cadena, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-                    Log.e(cadena, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
                     Log.e(cadena, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
                 }
             }
@@ -309,7 +303,7 @@ public class MainActivity extends FragmentActivity {
         }
     }
 
-    private LatLng getCenter(){
+    private LatLng getCenter() {
         return mMap.getCameraPosition().target;
     }
 
@@ -319,12 +313,13 @@ public class MainActivity extends FragmentActivity {
      * <p/>
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
+
     private void setUpMap() {
         mMap.moveCamera(CameraUpdateFactory.zoomTo(16));
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setZoomControlsEnabled(false);
         LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-
+        mMap.setOnMapLoadedCallback(this);
         // Define a listener that responds to location updates
         LocationListener locationListener = new LocationListener() {
             public void onLocationChanged(Location location) {
@@ -355,7 +350,31 @@ public class MainActivity extends FragmentActivity {
         if (shouldMoveMap) {
             //reportMarker = mMap.addMarker(new MarkerOptions().position(latlng).title("Reportar").visible(false).draggable(true));
             mMap.moveCamera(CameraUpdateFactory.newLatLng(latlng));
+
+            String cadena="";
+            Log.e(cadena, "Se cambió la ubicacion!!!!");
+            Log.e(cadena, "Se cambió la ubicacion!!!!");
+            Log.e(cadena, "Se cambió la ubicacion!!!!");
+            Log.e(cadena, "Se cambió la ubicacion!!!!");
+            Log.e(cadena, "Se cambió la ubicacion!!!!");
+            Log.e(cadena, "Se cambió la ubicacion!!!!");
+
+            mMap.clear();
+            HTTPTask task = new HTTPTask();
+            AsyncTask<String, Integer, String> respuesta = task.execute("getPoints",
+                    "http://pepo27devf.appspot.com/obtenerPuntos",
+                    "" + latlng.latitude + "",
+                    "" + latlng.longitude + "","");
+            try{
+                Log.e(cadena,respuesta.get());
+                GetPointsInRoute getPoints = new GetPointsInRoute();
+                drawDots(getPoints.drawPoints(respuesta.get()));
+
+            } catch(Exception e){
+                e.printStackTrace();
+            }
         }
+
     }
 
     ///////////////////////envio de datos
@@ -363,10 +382,45 @@ public class MainActivity extends FragmentActivity {
         try {
             HTTPTask task = new HTTPTask();
             task.setApplicationContext(getApplicationContext());
-            task.execute("" + getCenter().latitude, "" + getCenter().longitude, "" + score);
+            task.execute("sendScore",
+                        "http://pepo27devf.appspot.com/generarPunto",
+                        "" + getCenter().latitude,
+                        "" + getCenter().longitude,
+                        "" + score);
         } catch (Exception e) {
             Log.e(TAG, "error");
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onMapLoaded(){
+        if(mMap != null){
+            String cadena = "";
+            Log.e(cadena,"CARGO!");
+            Log.e(cadena,"CARGO!");
+            Log.e(cadena,"CARGO!");
+            Log.e(cadena,"CARGO!");
+            Log.e(cadena,"CARGO!");
+            Log.e(cadena,"CARGO!");
+            Log.e(cadena,"CARGO!");
+            Log.e(cadena,"CARGO!");
+            mMap.clear();
+            HTTPTask task = new HTTPTask();
+            AsyncTask<String, Integer, String> respuesta = task.execute("getPoints",
+                    "http://pepo27devf.appspot.com/obtenerPuntos",
+                    "" + latlng.latitude + "",
+                    "" + latlng.longitude + "","");
+            try{
+                Log.e(cadena,respuesta.get());
+                GetPointsInRoute getPoints = new GetPointsInRoute();
+                drawDots(getPoints.drawPoints(respuesta.get()));
+
+            } catch(Exception e){
+                e.printStackTrace();
+            }
+
+
         }
     }
 

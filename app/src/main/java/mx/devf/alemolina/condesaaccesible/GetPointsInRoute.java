@@ -7,7 +7,6 @@ import com.google.android.gms.maps.model.LatLng;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
@@ -15,10 +14,8 @@ import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +23,7 @@ import java.util.List;
  * Created by alemolina on 7/22/14.
  */
 public class GetPointsInRoute extends AsyncTask<LatLng, Integer, RouteResult> {
+    private String httpResponse = null;
 
     protected interface OnPathListener {
         public void latLngReady(RouteResult routeResult);
@@ -168,5 +166,71 @@ public class GetPointsInRoute extends AsyncTask<LatLng, Integer, RouteResult> {
             poly.add(p);
         }
         return poly;
+    }
+
+    public void setPointsInMap(LatLng origin) {
+        if (httpResponse != null) {
+            this.drawPoints(httpResponse);
+        } else {
+            HttpClient httpclient = new DefaultHttpClient();
+            //http://pepo27devf.appspot.com/obtenerPuntos?latitudOrigen=19.42592174537003&longitudOrigen=-99.16573014110327
+            HttpPost httppost = new HttpPost("http://pepo27devf.appspot.com/obtenerPuntos");
+            try {
+                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+
+                nameValuePairs.add(new BasicNameValuePair("latitudOrigen", "" + origin.latitude));
+                nameValuePairs.add(new BasicNameValuePair("longitudOrigen", "" + origin.longitude));
+
+                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+
+                Log.e(MainActivity.TAG, "URL: " + httppost.getURI());
+
+                // Execute HTTP Post Request
+                HttpResponse response = httpclient.execute(httppost);
+
+                String responseString = new BasicResponseHandler().handleResponse(response);
+
+                Log.e(MainActivity.TAG, "JSON Result: " + responseString);
+                this.drawPoints(responseString);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    public void setResponse(String respuesta) {
+        this.httpResponse = respuesta;
+    }
+
+    public ArrayList<PlaceDot> drawPoints(String responseString) {
+        try {
+            JSONObject jsonRoute = new JSONObject(responseString);
+
+
+            JSONArray keyPoints = jsonRoute.getJSONArray("puntosClave");
+
+            ArrayList<PlaceDot> placeDots = new ArrayList<PlaceDot>();
+            for (int i = 0; i < keyPoints.length(); i++) {
+
+                JSONObject keyPoint = keyPoints.getJSONObject(i);
+
+                double longitud = keyPoint.getDouble("longitud");
+                double latitud = keyPoint.getDouble("latitud");
+                int score = keyPoint.getInt("tipo");
+
+                PlaceDot placeDot = new PlaceDot();
+                placeDot.setScore(score);
+                placeDot.setPlace(new LatLng(latitud, longitud));
+
+                placeDots.add(placeDot);
+
+            }
+            return placeDots;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
