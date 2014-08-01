@@ -116,6 +116,8 @@ public class MainActivity extends FragmentActivity implements GoogleMap.OnMapLoa
                 latlngService.setListener(new GetLatLngFromId.OnLatLngListener() {
                     @Override
                     public void latLngReady(LatLng destination) {
+                        mMap.clear();
+                        drawPointsInRadius();
                         setDestinationPin(destination, placeName);
                         drawPath(latlng, destination);
                     }
@@ -191,7 +193,7 @@ public class MainActivity extends FragmentActivity implements GoogleMap.OnMapLoa
             @Override
             public void latLngReady(RouteResult routeResult) {
                 try {
-                    mMap.clear();
+
                     drawRoute2(routeResult.getRoute2());
                     drawRoute(routeResult.getRoute());
                     drawDots(routeResult.getDots());
@@ -410,7 +412,7 @@ public class MainActivity extends FragmentActivity implements GoogleMap.OnMapLoa
             drawPointsInRadius();
         }
     }
-    
+
     public void drawPointsInRadius(){
         String cadena = "";
         Log.e(cadena,"CARGO!");
