@@ -406,32 +406,35 @@ public class MainActivity extends FragmentActivity implements GoogleMap.OnMapLoa
     @Override
     public void onMapLoaded(){
         if(mMap != null){
-            String cadena = "";
-            Log.e(cadena,"CARGO!");
-            Log.e(cadena,"CARGO!");
-            Log.e(cadena,"CARGO!");
-            Log.e(cadena,"CARGO!");
-            Log.e(cadena,"CARGO!");
-            Log.e(cadena,"CARGO!");
-            Log.e(cadena,"CARGO!");
-            Log.e(cadena,"CARGO!");
             mMap.clear();
-            HTTPTask task = new HTTPTask();
-            AsyncTask<String, Integer, String> respuesta = task.execute("getPoints",
-                    "http://pepo27devf.appspot.com/obtenerPuntos",
-                    "" + latlng.latitude + "",
-                    "" + latlng.longitude + "","");
-            try{
-                Log.e(cadena,respuesta.get());
-                GetPointsInRoute getPoints = new GetPointsInRoute();
-                drawDots(getPoints.drawPoints(respuesta.get()));
+            drawPointsInRadius();
+        }
+    }
+    
+    public void drawPointsInRadius(){
+        String cadena = "";
+        Log.e(cadena,"CARGO!");
+        Log.e(cadena,"CARGO!");
+        Log.e(cadena,"CARGO!");
+        Log.e(cadena,"CARGO!");
+        Log.e(cadena,"CARGO!");
+        Log.e(cadena,"CARGO!");
+        Log.e(cadena,"CARGO!");
+        Log.e(cadena,"CARGO!");
+        HTTPTask task = new HTTPTask();
+        AsyncTask<String, Integer, String> respuesta = task.execute("getPoints",
+                "http://pepo27devf.appspot.com/obtenerPuntos",
+                "" + latlng.latitude + "",
+                "" + latlng.longitude + "","");
+        try{
+            Log.e(cadena,respuesta.get());
+            GetPointsInRoute getPoints = new GetPointsInRoute();
+            drawDots(getPoints.drawPoints(respuesta.get()));
 
-            } catch(Exception e){
-                e.printStackTrace();
-            }
-
-
+        } catch(Exception e){
+            e.printStackTrace();
         }
     }
 
 }
+
