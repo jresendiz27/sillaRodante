@@ -129,13 +129,13 @@ public class MainActivity extends FragmentActivity implements GoogleMap.OnMapLoa
         Log.i(TAG, "ADIOS");
     }
 
-    @Override
+    /*@Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu items for use in the action bar
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_activity_actions, menu);
         return super.onCreateOptionsMenu(menu);
-    }
+    }*/
 
     private Animation slideAnimation(final View view, final boolean slideUp) {
         int animationId = slideUp ? R.anim.slide_up : R.anim.slide_down;
