@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:myapp="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_search"
+        android:icon="@drawable/ic_launcher"
+        android:showAsAction="ifRoom"
+        android:title="Buscar destino" />
+
+    <item
+        android:id="@+id/action_report"
+        android:icon="@drawable/button_report"
+        android:showAsAction="ifRoom"
+        android:title="Reportar Accesibilidad" />
+</menu>

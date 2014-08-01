@@ -1,15 +1,15 @@
 package mx.devf.alemolina.condesaaccesible;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
-import android.view.accessibility.AccessibilityNodeInfo;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
@@ -126,6 +126,14 @@ public class MainActivity extends FragmentActivity {
 
 
         Log.i(TAG, "ADIOS");
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu items for use in the action bar
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_activity_actions, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     private Animation slideAnimation(final View view, final boolean slideUp) {
